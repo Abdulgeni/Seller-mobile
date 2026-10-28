@@ -9,6 +9,7 @@ import {
   PriceEditMutationSchema,
   ProductDraftSchema,
   ProductSchema,
+  RegisterFcmTokenRequestSchema,
   StockToggleMutationSchema,
   type AiSuggestionResponse,
   type DashboardKpiMetrics,
@@ -20,6 +21,7 @@ import {
   type PriceEditMutation,
   type Product,
   type ProductDraft,
+  type RegisterFcmTokenRequest,
   type StockToggleMutation,
 } from "@repo/schemas";
 import { logger } from "@repo/ui";
@@ -214,6 +216,19 @@ export class ApiClient {
 
   async getPaymentStatus(transactionId: string): Promise<PaymentTransaction> {
     return this.request(`/payments/transactions/${transactionId}`, { method: "GET" }, PaymentTransactionSchema);
+  }
+
+  // Push Notifications
+  async registerPushToken(req: RegisterFcmTokenRequest): Promise<{ success: boolean }> {
+    RegisterFcmTokenRequestSchema.parse(req);
+    return this.request(
+      "/notifications/fcm-token",
+      {
+        method: "POST",
+        body: JSON.stringify(req),
+      },
+      z.object({ success: z.boolean() })
+    );
   }
 }
 

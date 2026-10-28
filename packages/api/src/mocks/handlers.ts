@@ -376,4 +376,14 @@ export const handlers = [
 
     return HttpResponse.json(tx);
   }),
+
+  // Register FCM Token
+  http.post("*/notifications/fcm-token", async ({ request }) => {
+    await simulateNetworkConditions();
+    const body = (await request.json()) as { token?: string };
+    if (!body?.token) {
+      return HttpResponse.json({ message: "Token is required", code: "VALIDATION_ERROR" }, { status: 400 });
+    }
+    return HttpResponse.json({ success: true });
+  }),
 ];

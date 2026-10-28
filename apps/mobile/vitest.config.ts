@@ -35,6 +35,10 @@ export default defineConfig({
         find: "react-native-compressor",
         replacement: path.resolve(__dirname, "src/__tests__/image-shim.ts"),
       },
+      {
+        find: "expo-notifications",
+        replacement: path.resolve(__dirname, "src/__tests__/notifications-shim.ts"),
+      },
     ],
   },
 });
