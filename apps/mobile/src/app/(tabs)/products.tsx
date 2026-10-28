@@ -1,11 +1,13 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import * as Haptics from "expo-haptics";
 import { router } from "expo-router";
-import { Pressable, StyleSheet, Switch, Text, View } from "react-native";
+import { Alert, Modal, Pressable, StyleSheet, Text, View } from "react-native";
 import { FlashList } from "@shopify/flash-list";
 import { defaultApiClient, queryKeys } from "@repo/api";
 import type { Product, ProductCategory } from "@repo/schemas";
 import { Button, Card, EmptyState, Input, Skeleton, t, tokens } from "@repo/ui";
+import { ProductRowItem } from "../../features/products/ProductRowItem";
 
 const CATEGORY_CHIPS: { label: string; value?: ProductCategory | undefined }[] = [
   { label: "All" },
@@ -20,91 +22,138 @@ const CATEGORY_CHIPS: { label: string; value?: ProductCategory | undefined }[] =
 export default function ProductsScreen(): React.JSX.Element {
   const [selectedCategory, setSelectedCategory] = useState<ProductCategory | undefined>(undefined);
   const [search, setSearch] = useState("");
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [newPriceText, setNewPriceText] = useState("");
   const queryClient = useQueryClient();
 
-  const { data: products = [], isLoading, isError, error, refetch } = useQuery({
-    queryKey: queryKeys.products.list({ category: selectedCategory, search }),
-    queryFn: () => defaultApiClient.getProducts({ category: selectedCategory, search: search || undefined }),
+  const queryFilters = {
+    category: selectedCategory,
+    search: search || undefined,
+  };
+
+  const { data: products = [], isLoading, isError, error, isStale, refetch } = useQuery({
+    queryKey: queryKeys.products.list(queryFilters),
+    queryFn: () => defaultApiClient.getProducts(queryFilters),
   });
 
   // Optimistic Stock Toggle Mutation
-  const stockMutation = useMutation({
-    mutationFn: (variables: { productId: string; inStock: boolean }) =>
+  const stockMutation = useMutation<
+    Product,
+    Error,
+    { productId: string; inStock: boolean },
+    { previous: Product[] | undefined }
+  >({
+    mutationFn: (vars) =>
       defaultApiClient.toggleProductStock({
-        productId: variables.productId,
-        inStock: variables.inStock,
-        idempotencyKey: `stock_${variables.productId}_${Date.now()}`,
+        productId: vars.productId,
+        inStock: vars.inStock,
+        idempotencyKey: `stock_${vars.productId}_${Date.now()}`,
       }),
     onMutate: async ({ productId, inStock }) => {
       await queryClient.cancelQueries({ queryKey: queryKeys.products.lists() });
-      const previous = queryClient.getQueryData<Product[]>(
-        queryKeys.products.list({ category: selectedCategory, search })
-      );
+      const previous = queryClient.getQueryData<Product[]>(queryKeys.products.list(queryFilters));
 
       if (previous) {
         queryClient.setQueryData<Product[]>(
-          queryKeys.products.list({ category: selectedCategory, search }),
+          queryKeys.products.list(queryFilters),
           previous.map((p) => (p.id === productId ? { ...p, inStock } : p))
         );
       }
-
       return { previous };
     },
-    onError: (_err, _vars, context) => {
+    onError: (err, _vars, context) => {
       if (context?.previous) {
-        queryClient.setQueryData(
-          queryKeys.products.list({ category: selectedCategory, search }),
-          context.previous
-        );
+        queryClient.setQueryData(queryKeys.products.list(queryFilters), context.previous);
       }
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error).catch(() => {});
+      Alert.alert(
+        "Stock Update Failed",
+        err.message || "Could not update stock status. Rolled back."
+      );
+    },
+    onSuccess: () => {
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.products.lists() });
+      void queryClient.invalidateQueries({ queryKey: queryKeys.products.lists() });
     },
   });
 
-  const renderProductItem = ({ item }: { item: Product }) => {
-    return (
-      <Card style={styles.productCard}>
-        <View style={styles.cardHeader}>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.productTitle} numberOfLines={1}>
-              {item.title}
-            </Text>
-            <Text style={styles.productCategory}>{item.category}</Text>
-          </View>
-          <Pressable
-            onPress={() => router.push(`/products/${item.id}`)}
-            style={styles.editButton}
-          >
-            <Text style={styles.editText}>Edit</Text>
-          </Pressable>
-        </View>
+  // Optimistic Price Edit Mutation
+  const priceMutation = useMutation<
+    Product,
+    Error,
+    { productId: string; price: number },
+    { previous: Product[] | undefined }
+  >({
+    mutationFn: (vars) =>
+      defaultApiClient.editProductPrice({
+        productId: vars.productId,
+        price: vars.price,
+        idempotencyKey: `price_${vars.productId}_${Date.now()}`,
+      }),
+    onMutate: async ({ productId, price }) => {
+      await queryClient.cancelQueries({ queryKey: queryKeys.products.lists() });
+      const previous = queryClient.getQueryData<Product[]>(queryKeys.products.list(queryFilters));
 
-        <View style={styles.cardFooter}>
-          <Text style={styles.productPrice}>
-            {item.currency} {item.price.toLocaleString()}
-          </Text>
-          <View style={styles.stockToggleRow}>
-            <Text style={styles.stockLabel}>
-              {item.inStock ? t("products.inStock") : t("products.outOfStock")}
-            </Text>
-            <Switch
-              value={item.inStock}
-              onValueChange={(val) =>
-                stockMutation.mutate({ productId: item.id, inStock: val })
-              }
-              trackColor={{
-                false: tokens.colors.light.border,
-                true: tokens.colors.light.success,
-              }}
-              thumbColor={tokens.colors.light.surface}
-            />
-          </View>
-        </View>
-      </Card>
-    );
+      if (previous) {
+        queryClient.setQueryData<Product[]>(
+          queryKeys.products.list(queryFilters),
+          previous.map((p) => (p.id === productId ? { ...p, price } : p))
+        );
+      }
+      return { previous };
+    },
+    onError: (err, _vars, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData(queryKeys.products.list(queryFilters), context.previous);
+      }
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error).catch(() => {});
+      Alert.alert("Price Update Failed", err.message || "Failed to update price. Rolled back.");
+    },
+    onSuccess: () => {
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
+    },
+    onSettled: () => {
+      void queryClient.invalidateQueries({ queryKey: queryKeys.products.lists() });
+    },
+  });
+
+  const handleToggleStock = useCallback(
+    (productId: string, inStock: boolean) => {
+      stockMutation.mutate({ productId, inStock });
+    },
+    [stockMutation]
+  );
+
+  const handleQuickEditPrice = useCallback((prod: Product) => {
+    setEditingProduct(prod);
+    setNewPriceText(String(prod.price));
+  }, []);
+
+  const handleSavePrice = () => {
+    if (!editingProduct) return;
+    const numPrice = Number(newPriceText);
+    if (isNaN(numPrice) || numPrice <= 0) {
+      Alert.alert("Invalid Input", "Price must be a positive number.");
+      return;
+    }
+    priceMutation.mutate({ productId: editingProduct.id, price: numPrice });
+    setEditingProduct(null);
   };
+
+  const renderItem = useCallback(
+    ({ item }: { item: Product }) => (
+      <ProductRowItem
+        product={item}
+        onToggleStock={handleToggleStock}
+        onQuickEditPrice={handleQuickEditPrice}
+      />
+    ),
+    [handleToggleStock, handleQuickEditPrice]
+  );
+
+  const keyExtractor = useCallback((item: Product) => item.id, []);
 
   return (
     <View style={styles.container}>
@@ -149,11 +198,18 @@ export default function ProductsScreen(): React.JSX.Element {
         })}
       </View>
 
+      {/* Stale Cache Banner */}
+      {isStale && !isLoading && products.length > 0 && (
+        <View style={styles.staleBanner}>
+          <Text style={styles.staleText}>⚡ Offline cache active (showing cached products)</Text>
+        </View>
+      )}
+
       {isLoading ? (
         <View style={{ gap: tokens.spacing.sm, marginTop: tokens.spacing.sm }}>
-          <Skeleton height={100} borderRadius={tokens.radii.md} />
-          <Skeleton height={100} borderRadius={tokens.radii.md} />
-          <Skeleton height={100} borderRadius={tokens.radii.md} />
+          <Skeleton height={80} borderRadius={tokens.radii.md} />
+          <Skeleton height={80} borderRadius={tokens.radii.md} />
+          <Skeleton height={80} borderRadius={tokens.radii.md} />
         </View>
       ) : isError ? (
         <EmptyState
@@ -171,10 +227,52 @@ export default function ProductsScreen(): React.JSX.Element {
       ) : (
         <FlashList
           data={products}
-          renderItem={renderProductItem}
-          keyExtractor={(item) => item.id}
+          renderItem={renderItem}
+          keyExtractor={keyExtractor}
           contentContainerStyle={{ paddingBottom: tokens.spacing.xl }}
         />
+      )}
+
+      {/* Inline Quick Price Edit Modal */}
+      {editingProduct && (
+        <Modal
+          visible
+          transparent
+          animationType="fade"
+          onRequestClose={() => setEditingProduct(null)}
+        >
+          <View style={styles.modalOverlay}>
+            <Card style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Quick Price Edit</Text>
+              <Text style={styles.modalSubtitle} numberOfLines={1}>
+                {editingProduct.title}
+              </Text>
+              <Input
+                label={`New Price (${editingProduct.currency})`}
+                value={newPriceText}
+                onChangeText={setNewPriceText}
+                keyboardType="numeric"
+                autoFocus
+              />
+              <View style={styles.modalButtons}>
+                <View style={{ flex: 1 }}>
+                  <Button
+                    title="Cancel"
+                    variant="outline"
+                    onPress={() => setEditingProduct(null)}
+                  />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Button
+                    title="Save Price"
+                    loading={priceMutation.isPending}
+                    onPress={handleSavePrice}
+                  />
+                </View>
+              </View>
+            </Card>
+          </View>
+        </Modal>
       )}
     </View>
   );
@@ -188,13 +286,13 @@ const styles = StyleSheet.create({
   },
   topRow: {
     flexDirection: "row",
-    alignItems: "flex-start",
+    alignItems: "center",
   },
   chipRow: {
     flexDirection: "row",
     flexWrap: "wrap",
     gap: tokens.spacing.xs,
-    marginBottom: tokens.spacing.md,
+    marginVertical: tokens.spacing.sm,
   },
   chip: {
     paddingHorizontal: tokens.spacing.sm,
@@ -203,7 +301,7 @@ const styles = StyleSheet.create({
     backgroundColor: tokens.colors.light.surfaceSubtle,
     borderWidth: 1,
     borderColor: tokens.colors.light.border,
-    minHeight: 32,
+    minHeight: 28,
     justifyContent: "center",
   },
   chipText: {
@@ -211,54 +309,42 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     color: tokens.colors.light.contentSecondary,
   },
-  productCard: {
-    marginBottom: tokens.spacing.sm,
-  },
-  cardHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-  },
-  productTitle: {
-    fontSize: 15,
-    fontWeight: "700",
-    color: tokens.colors.light.contentPrimary,
-  },
-  productCategory: {
-    fontSize: 12,
-    color: tokens.colors.light.contentMuted,
-    marginTop: 2,
-  },
-  editButton: {
-    paddingHorizontal: tokens.spacing.sm,
-    paddingVertical: 4,
-    borderRadius: tokens.radii.sm,
+  staleBanner: {
     backgroundColor: tokens.colors.light.surfaceSubtle,
+    paddingVertical: tokens.spacing.xs,
+    paddingHorizontal: tokens.spacing.sm,
+    borderRadius: tokens.radii.sm,
+    marginBottom: tokens.spacing.xs,
+    borderLeftWidth: 3,
+    borderLeftColor: tokens.colors.light.primary,
   },
-  editText: {
-    fontSize: 12,
-    fontWeight: "600",
-    color: tokens.colors.light.primary,
-  },
-  cardFooter: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginTop: tokens.spacing.md,
-  },
-  productPrice: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: tokens.colors.light.contentPrimary,
-  },
-  stockToggleRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: tokens.spacing.xs,
-  },
-  stockLabel: {
-    fontSize: 12,
+  staleText: {
+    fontSize: 11,
     color: tokens.colors.light.contentSecondary,
     fontWeight: "500",
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "center",
+    padding: tokens.spacing.lg,
+  },
+  modalContent: {
+    padding: tokens.spacing.lg,
+    gap: tokens.spacing.md,
+  },
+  modalTitle: {
+    fontSize: 17,
+    fontWeight: "700",
+    color: tokens.colors.light.contentPrimary,
+  },
+  modalSubtitle: {
+    fontSize: 13,
+    color: tokens.colors.light.contentSecondary,
+  },
+  modalButtons: {
+    flexDirection: "row",
+    gap: tokens.spacing.sm,
+    marginTop: tokens.spacing.sm,
   },
 });
