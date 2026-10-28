@@ -8,8 +8,8 @@
 | L1 | Walking Skeleton | Monorepo layout, Expo app, theme/i18n/logger, API client + MSW, CI | `typecheck:green`, `test:green`, `lint:green`, `expo-doctor:green`, `smoke:green` | Hoisted pnpm, 4 monorepo packages, Expo SDK 58, 13/13 vitest tests green, flat eslint config green, emulator snapshot verified. |
 | L2 | Order List & Detail | FlashList orders, status chips, search, detail screen, cache | `typecheck:green`, `test:green`, `lint:green`, `expo-doctor:green`, `smoke:green` | FlashList order list with status filter chips, date filters, search, stale cache indicator, detail view with items, customer, and status timeline. |
 | L3 | Order State Machine | Typed order transitions, optimistic patch, rollback toast | `typecheck:green`, `test:green`, `lint:green`, `expo-doctor:green`, `smoke:green` | Typed order state machine in `@repo/schemas`, 11 transition unit tests green, MSW rejection of illegal transitions, TanStack Query optimistic updates with snapshot rollback toast and expo-haptics. |
-| L4 | Sync Queue & Idempotency | Persisted queue, UUID v4 idempotency, offline banner & flush | Pending | Next up |
-| L5 | Product Catalogue (5k) | FlashList grid 60 FPS, stock toggle, inline price edit | Pending | - |
+| L4 | Sync Queue & Idempotency | Persisted queue, UUID v4 idempotency, offline banner & flush | `typecheck:green`, `test:green`, `lint:green`, `expo-doctor:green`, `smoke:green` | Persisted `SyncQueueManager`, UUID v4 idempotency keys, `createSyncExecutor` mapping mutations to typed API endpoints with backoff, global `SyncBanner` with pending count & manual flush. |
+| L5 | Product Catalogue (5k) | FlashList grid 60 FPS, stock toggle, inline price edit | In Progress | Next up |
 | L6 | Photo Pipeline | VisionCamera capture, compressor <= 200KB, mock storage upload | Pending | - |
 | L7 | Product Draft & Variants | react-hook-form + Zod, variant matrix, AI stub, MMKV persistence | Pending | - |
 | L8 | Push Notifications & Links | FCM interface, action categories, deep-link router | Pending | - |

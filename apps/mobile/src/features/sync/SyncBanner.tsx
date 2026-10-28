@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
-import { syncQueue } from "@repo/api";
+import { useQueryClient } from "@tanstack/react-query";
+import * as Haptics from "expo-haptics";
+import { Alert, StyleSheet, Text, View } from "react-native";
+import { createSyncExecutor, defaultApiClient, syncQueue } from "@repo/api";
 import { Button, t, tokens } from "@repo/ui";
 
 export function SyncBanner(): React.JSX.Element | null {
   const [pendingCount, setPendingCount] = useState(0);
   const [isSyncing, setIsSyncing] = useState(false);
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     return syncQueue.subscribe((count) => {
@@ -20,9 +23,24 @@ export function SyncBanner(): React.JSX.Element | null {
   const handleSyncNow = async () => {
     setIsSyncing(true);
     try {
-      await syncQueue.flushQueue(async () => {
-        // Mock flush execution
-      });
+      const executor = createSyncExecutor(defaultApiClient);
+      const result = await syncQueue.flushQueue(executor);
+
+      if (result.processed > 0) {
+        syncQueue.clearSettled();
+        void queryClient.invalidateQueries();
+        void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
+        Alert.alert(
+          "Sync Complete",
+          `Synced ${result.processed} offline ${result.processed === 1 ? "mutation" : "mutations"}.`
+        );
+      } else if (result.failed > 0) {
+        void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error).catch(() => {});
+        Alert.alert("Sync Incomplete", `${result.failed} mutations failed. Will retry automatically.`);
+      }
+    } catch {
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error).catch(() => {});
+      Alert.alert("Sync Error", "Could not reach the server to flush queued mutations.");
     } finally {
       setIsSyncing(false);
     }
