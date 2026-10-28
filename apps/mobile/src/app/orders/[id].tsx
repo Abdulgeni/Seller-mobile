@@ -1,19 +1,16 @@
 import React, { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import * as Haptics from "expo-haptics";
 import { useLocalSearchParams } from "expo-router";
 import { Alert, ScrollView, StyleSheet, Text, View } from "react-native";
 import { defaultApiClient, queryKeys } from "@repo/api";
-import type { OrderStatus } from "@repo/schemas";
+import {
+  assertValidOrderTransition,
+  getNextOrderStatuses,
+  type Order,
+  type OrderStatus,
+} from "@repo/schemas";
 import { Badge, Button, Card, EmptyState, Skeleton, t, tokens } from "@repo/ui";
-
-const VALID_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
-  NEW: ["ACCEPTED", "CANCELLED"],
-  ACCEPTED: ["PACKED", "CANCELLED"],
-  PACKED: ["SHIPPED", "CANCELLED"],
-  SHIPPED: ["DELIVERED"],
-  DELIVERED: [],
-  CANCELLED: [],
-};
 
 const getBadgeVariant = (status: OrderStatus): "new" | "accepted" | "packed" | "shipped" | "delivered" | "cancelled" => {
   switch (status) {
@@ -38,21 +35,72 @@ export default function OrderDetailScreen(): React.JSX.Element {
     enabled: Boolean(orderId),
   });
 
-  const transitionMutation = useMutation({
-    mutationFn: (toStatus: OrderStatus) =>
-      defaultApiClient.transitionOrderStatus({
+  const transitionMutation = useMutation<
+    Order,
+    Error,
+    OrderStatus,
+    { previousOrder: Order | undefined }
+  >({
+    mutationFn: async (toStatus: OrderStatus) => {
+      if (!order) throw new Error("Order not loaded");
+      assertValidOrderTransition(order.status, toStatus);
+      return defaultApiClient.transitionOrderStatus({
         orderId,
-        fromStatus: order!.status,
+        fromStatus: order.status,
         toStatus,
         idempotencyKey: `ord_trans_${orderId}_${toStatus}_${Date.now()}`,
-      }),
-    onSuccess: (updated) => {
-      queryClient.setQueryData(queryKeys.orders.detail(orderId), updated);
-      queryClient.invalidateQueries({ queryKey: queryKeys.orders.lists() });
-      Alert.alert("Success", `Order status updated to ${updated.status}`);
+      });
     },
-    onError: (err) => {
-      Alert.alert("Error", err instanceof Error ? err.message : "Failed to update status");
+    onMutate: async (toStatus: OrderStatus) => {
+      // 1. Cancel active queries for detail and list
+      await queryClient.cancelQueries({ queryKey: queryKeys.orders.detail(orderId) });
+      await queryClient.cancelQueries({ queryKey: queryKeys.orders.lists() });
+
+      // 2. Snapshot previous value
+      const previousOrder = queryClient.getQueryData<Order>(queryKeys.orders.detail(orderId));
+
+      // 3. Optimistically patch cache
+      if (previousOrder) {
+        const optimisticOrder: Order = {
+          ...previousOrder,
+          status: toStatus,
+          updatedAt: new Date().toISOString(),
+          timeline: [
+            ...previousOrder.timeline,
+            {
+              id: `tl_opt_${Date.now()}`,
+              status: toStatus,
+              timestamp: new Date().toISOString(),
+              actor: "Merchant (Optimistic)",
+              note: `Optimistic transition to ${toStatus}`,
+            },
+          ],
+        };
+        queryClient.setQueryData(queryKeys.orders.detail(orderId), optimisticOrder);
+      }
+
+      return { previousOrder };
+    },
+    onError: (err, _variables, context) => {
+      // 4. Rollback to snapshot on error
+      if (context?.previousOrder) {
+        queryClient.setQueryData(queryKeys.orders.detail(orderId), context.previousOrder);
+      }
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error).catch(() => {});
+      Alert.alert(
+        "Transition Rolled Back",
+        err.message || "Failed to transition order status. Rolled back to previous state."
+      );
+    },
+    onSuccess: (updated) => {
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
+      queryClient.setQueryData(queryKeys.orders.detail(orderId), updated);
+      Alert.alert("Status Updated", `Order status updated to ${updated.status}`);
+    },
+    onSettled: () => {
+      // 5. Invalidate on settled
+      void queryClient.invalidateQueries({ queryKey: queryKeys.orders.detail(orderId) });
+      void queryClient.invalidateQueries({ queryKey: queryKeys.orders.lists() });
     },
   });
 
@@ -69,11 +117,13 @@ export default function OrderDetailScreen(): React.JSX.Element {
         idempotencyKey: `pay_${order.id}_${Date.now()}`,
       });
 
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
       Alert.alert(
         "M-Pesa STK Push Sent",
         `Sent request for ${order.currency} ${order.total} to ${order.customer.phone}.\nStatus: ${tx.state}`
       );
     } catch (err) {
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error).catch(() => {});
       Alert.alert("Payment Error", err instanceof Error ? err.message : "Failed to initiate payment");
     } finally {
       setPaymentInProgress(false);
@@ -111,7 +161,7 @@ export default function OrderDetailScreen(): React.JSX.Element {
     );
   }
 
-  const nextActions = VALID_TRANSITIONS[order.status] ?? [];
+  const nextActions = getNextOrderStatuses(order.status);
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -209,6 +259,7 @@ const styles = StyleSheet.create({
   container: {
     padding: tokens.spacing.md,
     gap: tokens.spacing.md,
+    backgroundColor: tokens.colors.light.background,
   },
   rowBetween: {
     flexDirection: "row",
@@ -267,7 +318,7 @@ const styles = StyleSheet.create({
     marginVertical: tokens.spacing.sm,
   },
   totalLabel: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: "600",
     color: tokens.colors.light.contentPrimary,
   },
@@ -282,11 +333,11 @@ const styles = StyleSheet.create({
     marginBottom: tokens.spacing.sm,
   },
   timelineDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
     backgroundColor: tokens.colors.light.primary,
-    marginTop: 4,
+    marginTop: 5,
   },
   timelineStatus: {
     fontSize: 13,
@@ -303,8 +354,8 @@ const styles = StyleSheet.create({
   },
   timelineNote: {
     fontSize: 12,
-    color: tokens.colors.light.contentSecondary,
     fontStyle: "italic",
+    color: tokens.colors.light.contentMuted,
     marginTop: 2,
   },
   actionsContainer: {
@@ -313,8 +364,9 @@ const styles = StyleSheet.create({
   },
   actionsHeading: {
     fontSize: 15,
-    fontWeight: "600",
+    fontWeight: "700",
     color: tokens.colors.light.contentPrimary,
+    marginBottom: tokens.spacing.xs,
   },
   actionsButtons: {
     gap: tokens.spacing.sm,

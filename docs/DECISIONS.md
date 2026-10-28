@@ -19,3 +19,4 @@ Format: `assumption → why → reversible (y/n) → how to change`
 - Single design token preset with NativeWind/Tailwind → Ensures zero hardcoded hex codes, accessible contrast, and instant light/dark mode support → y → Swap NativeWind preset with Tamagui or Restyle theme provider
 - English-only i18n translation layer `t()` → Prepares UI strings for localization without upfront overhead of multi-language dictionaries → y → Add locale dictionary JSON files to `packages/ui/i18n`
 - In-memory mock storage with Supabase-compatible interface for photo uploads → Allows fully offline-capable photo catalogue creation without external cloud storage credentials → y → Swap storage client URL and keys to live Supabase / S3 bucket
+- expo-haptics ~58.0.7 for mutation and rollback feedback → Provides tactile accessibility cues on mutation success and optimistic rollback per NFR §5 → y → Swap or disable Haptics calls in UI mutation handlers

@@ -5,11 +5,12 @@ import {
   generateSeedTransactions,
 } from "./fixtures";
 import { delay, http, HttpResponse } from "msw";
-import type {
-  Order,
-  OrderStatus,
-  PaymentTransaction,
-  Product,
+import {
+  canTransitionOrder,
+  type Order,
+  type OrderStatus,
+  type PaymentTransaction,
+  type Product,
 } from "@repo/schemas";
 
 // In-memory mock database state
@@ -268,6 +269,14 @@ export const handlers = [
 
     const body = (await request.json()) as { toStatus: OrderStatus; note?: string };
     const prevStatus = order.status;
+
+    if (!canTransitionOrder(prevStatus, body.toStatus)) {
+      return HttpResponse.json(
+        { message: `Cannot transition order from ${prevStatus} to ${body.toStatus}`, code: "INVALID_TRANSITION" },
+        { status: 400 }
+      );
+    }
+
     order.status = body.toStatus;
     order.updatedAt = new Date().toISOString();
     order.timeline.push({

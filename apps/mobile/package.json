@@ -22,6 +22,7 @@
     "expo-build-properties": "~58.0.11",
     "expo-constants": "~58.0.13",
     "expo-font": "~58.0.2",
+    "expo-haptics": "~58.0.7",
     "expo-linking": "~58.0.14",
     "expo-local-authentication": "~58.0.2",
     "expo-notifications": "~58.1.6",
