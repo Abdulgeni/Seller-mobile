@@ -29,24 +29,24 @@ export default function OrdersScreen(): React.JSX.Element {
   const [dateFilter, setDateFilter] = useState<DateFilterKey>("ALL");
   const [search, setSearch] = useState("");
 
-  const startDate = dateFilter === "TODAY"
-    ? new Date(new Date().setHours(0, 0, 0, 0)).toISOString()
-    : dateFilter === "WEEK"
-    ? new Date(Date.now() - 7 * 86400000).toISOString()
-    : undefined;
-
   const { data: orders = [], isLoading, isError, error, isStale, refetch } = useQuery({
-    queryKey: queryKeys.orders.list({
-      status: selectedStatus,
-      search: search || undefined,
-      startDate,
-    }),
-    queryFn: () =>
-      defaultApiClient.getOrders({
+    queryKey: [...queryKeys.orders.lists(), { status: selectedStatus, search: search || undefined, dateFilter }],
+    queryFn: () => {
+      let startDate: string | undefined = undefined;
+      if (dateFilter === "TODAY") {
+        const d = new Date();
+        d.setHours(0, 0, 0, 0);
+        startDate = d.toISOString();
+      } else if (dateFilter === "WEEK") {
+        startDate = new Date(Date.now() - 7 * 86400000).toISOString();
+      }
+
+      return defaultApiClient.getOrders({
         status: selectedStatus,
         search: search || undefined,
         startDate,
-      }),
+      });
+    },
   });
 
   const getBadgeVariant = (status: OrderStatus): "new" | "accepted" | "packed" | "shipped" | "delivered" | "cancelled" => {
