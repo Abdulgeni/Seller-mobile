@@ -1,0 +1,21 @@
+# Decisions & Assumptions Log
+
+Format: `assumption → why → reversible (y/n) → how to change`
+
+- Single-vendor e-commerce store architecture → Locked project requirement; simplifies MVP seller ops while keeping multi-vendor seam in schema → y → Add `vendorId` routing, multi-tenant auth context, and split settlement rules in `packages/schemas` and `packages/api`
+- Pnpm with hoisted node-linker in Turborepo → React Native Metro bundler struggles with standard pnpm symlinks; hoisting mimics flat `node_modules` → y → Switch to standard pnpm with Metro configuration `resolver.nodeModulesPaths` or Bun
+- Monorepo package split into `schemas`, `api`, `ui`, `config` + `apps/mobile` → Enforces clean vertical slices and boundary contracts; prevents reverse imports into shared logic → y → Consolidate packages into mobile app or extract further sub-packages
+- Zod 3.x for runtime validation at all boundaries → Deep links, push payloads, MMKV data, and API responses require strict schema validation without `any` → y → Swap validation engine in `packages/schemas` to ArkType or Valibot
+- TanStack Query v5 for server state and cache → Standard React Native server state solution with robust optimistic mutation and cache invalidation primitives → y → Wrap queries in custom hooks to shield UI layer if replacing
+- Zustand for client-side ephemeral state only → Keeps server state strictly separated from client UI filters, active modals, and temporary draft scratchpads → y → Replace with React Context + reducers without altering server data flow
+- Shopify FlashList for all virtualized list views → FlatList has frame drops and memory spikes with 5,000+ items; FlashList reuses cells for stable 60 FPS → y → Replace FlashList components with standard VirtualizedList wrappers
+- WatermelonDB for offline relational persistence (orders/products) + MMKV for KV/drafts → WatermelonDB handles fast local SQLite queries with lazy loading; MMKV provides microsecond synchronous KV storage → y → Migrate WatermelonDB schema to expo-sqlite or OP-SQLite via repository interface
+- Persisted Sync Queue with UUID v4 idempotency keys → Guarantees offline mutations flush exactly once in FIFO order without duplicate side effects on network reconnection → y → Change sync engine worker implementation in `packages/api/sync`
+- Mobile-Money (M-Pesa style) STK push simulation state machine → Reflects Kenyan/East African mobile commerce reality with terminal failure paths (insufficient funds, timeout, user cancelled) → y → Replace mock simulator with Daraja API / Stripe / Paystack client in `packages/api`
+- react-native-vision-camera for photo capture → Native 60 FPS camera pipeline extensible to MLKit frame processors for future barcode/SKU scanning → y → Fallback to `expo-camera` or `expo-image-picker`
+- react-native-compressor for off-JS-thread compression → Compresses photos to <= 200 KB and <= 1600 px without blocking JS thread → y → Use native image manipulation modules or `expo-image-manipulator`
+- Local notification harness for FCM testing in dev build → Real FCM requires live Google Play Services and registered APNs/FCM keys; interface abstraction allows realistic testing → y → Plug production `google-services.json` and APNs certificates into `apps/mobile`
+- 5-minute background biometric re-auth gate → Protects financial screens (payouts, bank details) from unauthorized physical access when app is backgrounded → y → Adjust threshold constant or disable biometric challenge in `features/auth/biometrics`
+- Single design token preset with NativeWind/Tailwind → Ensures zero hardcoded hex codes, accessible contrast, and instant light/dark mode support → y → Swap NativeWind preset with Tamagui or Restyle theme provider
+- English-only i18n translation layer `t()` → Prepares UI strings for localization without upfront overhead of multi-language dictionaries → y → Add locale dictionary JSON files to `packages/ui/i18n`
+- In-memory mock storage with Supabase-compatible interface for photo uploads → Allows fully offline-capable photo catalogue creation without external cloud storage credentials → y → Swap storage client URL and keys to live Supabase / S3 bucket
