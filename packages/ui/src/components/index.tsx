@@ -146,8 +146,8 @@ export function Badge({ label, variant = "default" }: BadgeProps): React.JSX.Ele
 
 // Input
 export interface InputProps extends TextInputProps {
-  label?: string;
-  error?: string;
+  label?: string | undefined;
+  error?: string | undefined;
 }
 
 export function Input({ label, error, style, ...props }: InputProps): React.JSX.Element {
