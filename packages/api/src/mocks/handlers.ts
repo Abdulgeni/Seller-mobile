@@ -219,6 +219,7 @@ export const handlers = [
     const url = new URL(request.url);
     const status = url.searchParams.get("status");
     const search = url.searchParams.get("search")?.toLowerCase();
+    const startDate = url.searchParams.get("startDate");
 
     let filtered = mockDb.orders;
     if (status) {
@@ -230,6 +231,9 @@ export const handlers = [
           o.orderNumber.toLowerCase().includes(search) ||
           o.customer.name.toLowerCase().includes(search)
       );
+    }
+    if (startDate) {
+      filtered = filtered.filter((o) => new Date(o.createdAt) >= new Date(startDate));
     }
 
     return HttpResponse.json(filtered);

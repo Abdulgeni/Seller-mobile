@@ -6,8 +6,8 @@
 |---|---|---|---|---|
 | L0 | Recon & Plan | Architecture, 17 ADRs, Decision Log, Backlog, Env Check | `env:green`, `docs:green` | Discovered Node v22.16.0, Java 22.0.1, Android SDK API 37 emulator running (`emulator-5554`), installed pnpm v12.15.0 and added to User PATH. |
 | L1 | Walking Skeleton | Monorepo layout, Expo app, theme/i18n/logger, API client + MSW, CI | `typecheck:green`, `test:green`, `lint:green`, `expo-doctor:green`, `smoke:green` | Hoisted pnpm, 4 monorepo packages, Expo SDK 58, 13/13 vitest tests green, flat eslint config green, emulator snapshot verified. |
-| L2 | Order List & Detail | FlashList orders, status chips, search, detail screen, cache | In Progress | - |
-| L3 | Order State Machine | Typed order transitions, optimistic patch, rollback toast | Pending | - |
+| L2 | Order List & Detail | FlashList orders, status chips, search, detail screen, cache | `typecheck:green`, `test:green`, `lint:green`, `expo-doctor:green`, `smoke:green` | FlashList order list with status filter chips, date filters, search, stale cache indicator, detail view with items, customer, and status timeline. |
+| L3 | Order State Machine | Typed order transitions, optimistic patch, rollback toast | In Progress | Next up |
 | L4 | Sync Queue & Idempotency | Persisted queue, UUID v4 idempotency, offline banner & flush | Pending | - |
 | L5 | Product Catalogue (5k) | FlashList grid 60 FPS, stock toggle, inline price edit | Pending | - |
 | L6 | Photo Pipeline | VisionCamera capture, compressor <= 200KB, mock storage upload | Pending | - |

@@ -17,13 +17,36 @@ const STATUS_FILTERS: { label: string; value?: OrderStatus | undefined }[] = [
   { label: "Cancelled", value: "CANCELLED" },
 ];
 
+type DateFilterKey = "ALL" | "TODAY" | "WEEK";
+const DATE_FILTERS: { label: string; key: DateFilterKey }[] = [
+  { label: "All Time", key: "ALL" },
+  { label: "Today", key: "TODAY" },
+  { label: "Last 7 Days", key: "WEEK" },
+];
+
 export default function OrdersScreen(): React.JSX.Element {
   const [selectedStatus, setSelectedStatus] = useState<OrderStatus | undefined>(undefined);
+  const [dateFilter, setDateFilter] = useState<DateFilterKey>("ALL");
   const [search, setSearch] = useState("");
 
-  const { data: orders = [], isLoading, isError, error, refetch } = useQuery({
-    queryKey: queryKeys.orders.list({ status: selectedStatus, search }),
-    queryFn: () => defaultApiClient.getOrders({ status: selectedStatus, search: search || undefined }),
+  const startDate = dateFilter === "TODAY"
+    ? new Date(new Date().setHours(0, 0, 0, 0)).toISOString()
+    : dateFilter === "WEEK"
+    ? new Date(Date.now() - 7 * 86400000).toISOString()
+    : undefined;
+
+  const { data: orders = [], isLoading, isError, error, isStale, refetch } = useQuery({
+    queryKey: queryKeys.orders.list({
+      status: selectedStatus,
+      search: search || undefined,
+      startDate,
+    }),
+    queryFn: () =>
+      defaultApiClient.getOrders({
+        status: selectedStatus,
+        search: search || undefined,
+        startDate,
+      }),
   });
 
   const getBadgeVariant = (status: OrderStatus): "new" | "accepted" | "packed" | "shipped" | "delivered" | "cancelled" => {
@@ -77,7 +100,33 @@ export default function OrdersScreen(): React.JSX.Element {
         onChangeText={setSearch}
       />
 
-      {/* Filter Chips */}
+      {/* Date Filter Tabs */}
+      <View style={styles.dateFilterRow}>
+        {DATE_FILTERS.map((df) => {
+          const isSelected = dateFilter === df.key;
+          return (
+            <Pressable
+              key={df.key}
+              onPress={() => setDateFilter(df.key)}
+              style={[
+                styles.dateChip,
+                isSelected && { backgroundColor: tokens.colors.light.surfaceSubtle, borderColor: tokens.colors.light.primary },
+              ]}
+            >
+              <Text
+                style={[
+                  styles.dateChipText,
+                  isSelected && { color: tokens.colors.light.primary, fontWeight: "700" },
+                ]}
+              >
+                {df.label}
+              </Text>
+            </Pressable>
+          );
+        })}
+      </View>
+
+      {/* Status Filter Chips */}
       <View style={styles.filterRow}>
         {STATUS_FILTERS.map((chip) => {
           const isSelected = selectedStatus === chip.value;
@@ -102,6 +151,13 @@ export default function OrdersScreen(): React.JSX.Element {
           );
         })}
       </View>
+
+      {/* Stale Cache Indicator */}
+      {isStale && !isLoading && orders.length > 0 && (
+        <View style={styles.staleBanner}>
+          <Text style={styles.staleText}>⚡ Offline cache active (showing cached orders)</Text>
+        </View>
+      )}
 
       {isLoading ? (
         <View style={{ gap: tokens.spacing.sm, marginTop: tokens.spacing.sm }}>
@@ -139,11 +195,28 @@ const styles = StyleSheet.create({
     padding: tokens.spacing.md,
     backgroundColor: tokens.colors.light.background,
   },
+  dateFilterRow: {
+    flexDirection: "row",
+    gap: tokens.spacing.xs,
+    marginBottom: tokens.spacing.xs,
+  },
+  dateChip: {
+    paddingHorizontal: tokens.spacing.sm,
+    paddingVertical: 4,
+    borderRadius: tokens.radii.sm,
+    borderWidth: 1,
+    borderColor: tokens.colors.light.border,
+  },
+  dateChipText: {
+    fontSize: 12,
+    fontWeight: "500",
+    color: tokens.colors.light.contentSecondary,
+  },
   filterRow: {
     flexDirection: "row",
     flexWrap: "wrap",
     gap: tokens.spacing.xs,
-    marginBottom: tokens.spacing.md,
+    marginBottom: tokens.spacing.sm,
   },
   chip: {
     paddingHorizontal: tokens.spacing.sm,
@@ -152,13 +225,27 @@ const styles = StyleSheet.create({
     backgroundColor: tokens.colors.light.surfaceSubtle,
     borderWidth: 1,
     borderColor: tokens.colors.light.border,
-    minHeight: 32,
+    minHeight: 28,
     justifyContent: "center",
   },
   chipText: {
     fontSize: 12,
     fontWeight: "500",
     color: tokens.colors.light.contentSecondary,
+  },
+  staleBanner: {
+    backgroundColor: tokens.colors.light.surfaceSubtle,
+    paddingVertical: tokens.spacing.xs,
+    paddingHorizontal: tokens.spacing.sm,
+    borderRadius: tokens.radii.sm,
+    marginBottom: tokens.spacing.xs,
+    borderLeftWidth: 3,
+    borderLeftColor: tokens.colors.light.primary,
+  },
+  staleText: {
+    fontSize: 11,
+    color: tokens.colors.light.contentSecondary,
+    fontWeight: "500",
   },
   orderHeader: {
     flexDirection: "row",

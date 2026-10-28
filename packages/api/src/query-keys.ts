@@ -10,8 +10,12 @@ export const queryKeys = {
   orders: {
     all: ["orders"] as const,
     lists: () => [...queryKeys.orders.all, "list"] as const,
-    list: (filters?: { status?: string | undefined; search?: string | undefined }) =>
-      [...queryKeys.orders.lists(), filters ?? {}] as const,
+    list: (filters?: {
+      status?: string | undefined;
+      search?: string | undefined;
+      startDate?: string | undefined;
+      endDate?: string | undefined;
+    }) => [...queryKeys.orders.lists(), filters ?? {}] as const,
     details: () => [...queryKeys.orders.all, "detail"] as const,
     detail: (id: string) => [...queryKeys.orders.details(), id] as const,
   },

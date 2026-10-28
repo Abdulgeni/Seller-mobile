@@ -15,6 +15,17 @@ const VALID_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
   CANCELLED: [],
 };
 
+const getBadgeVariant = (status: OrderStatus): "new" | "accepted" | "packed" | "shipped" | "delivered" | "cancelled" => {
+  switch (status) {
+    case "NEW": return "new";
+    case "ACCEPTED": return "accepted";
+    case "PACKED": return "packed";
+    case "SHIPPED": return "shipped";
+    case "DELIVERED": return "delivered";
+    case "CANCELLED": return "cancelled";
+  }
+};
+
 export default function OrderDetailScreen(): React.JSX.Element {
   const params = useLocalSearchParams<{ id?: string }>();
   const orderId = params.id ?? "";
@@ -108,7 +119,7 @@ export default function OrderDetailScreen(): React.JSX.Element {
       <Card>
         <View style={styles.rowBetween}>
           <Text style={styles.orderNumber}>{order.orderNumber}</Text>
-          <Badge label={order.status} variant="new" />
+          <Badge label={order.status} variant={getBadgeVariant(order.status)} />
         </View>
         <Text style={styles.orderDate}>Placed on {new Date(order.createdAt).toLocaleDateString()}</Text>
       </Card>

@@ -51,4 +51,16 @@ describe("ApiClient with MSW", () => {
       expect(order.status).toBe("NEW");
     }
   });
+
+  it("fetches single order detail with customer and line items", async () => {
+    const orders = await client.getOrders();
+    expect(orders.length).toBeGreaterThan(0);
+    const firstId = orders[0]!.id;
+
+    const detail = await client.getOrder(firstId);
+    expect(detail.id).toBe(firstId);
+    expect(detail.customer.name).toBeDefined();
+    expect(detail.items.length).toBeGreaterThan(0);
+    expect(detail.timeline.length).toBeGreaterThan(0);
+  });
 });
