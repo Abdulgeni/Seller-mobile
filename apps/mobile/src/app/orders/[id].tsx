@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import * as Haptics from "expo-haptics";
 import { useLocalSearchParams } from "expo-router";
@@ -24,10 +24,11 @@ const getBadgeVariant = (status: OrderStatus): "new" | "accepted" | "packed" | "
 };
 
 export default function OrderDetailScreen(): React.JSX.Element {
-  const params = useLocalSearchParams<{ id?: string }>();
+  const params = useLocalSearchParams<{ id?: string; action?: string }>();
   const orderId = params.id ?? "";
   const queryClient = useQueryClient();
   const [paymentInProgress, setPaymentInProgress] = useState(false);
+  const hasAutoAcceptedRef = useRef(false);
 
   const { data: order, isLoading, isError, error, refetch } = useQuery({
     queryKey: queryKeys.orders.detail(orderId),
@@ -129,6 +130,13 @@ export default function OrderDetailScreen(): React.JSX.Element {
       setPaymentInProgress(false);
     }
   };
+
+  useEffect(() => {
+    if (params.action === "accept" && order?.status === "NEW" && !hasAutoAcceptedRef.current && !transitionMutation.isPending) {
+      hasAutoAcceptedRef.current = true;
+      transitionMutation.mutate("ACCEPTED");
+    }
+  }, [params.action, order?.status, transitionMutation]);
 
   if (!orderId) {
     return (

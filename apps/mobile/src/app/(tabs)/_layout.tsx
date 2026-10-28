@@ -2,8 +2,11 @@ import React from "react";
 import { Tabs } from "expo-router";
 import { Text } from "react-native";
 import { t, tokens } from "@repo/ui";
+import { useNotificationStore } from "../../features/notifications/notificationStore";
 
 export default function TabsLayout(): React.JSX.Element {
+  const unreadCount = useNotificationStore((s) => s.unreadCount);
+
   return (
     <Tabs
       screenOptions={{
@@ -33,6 +36,7 @@ export default function TabsLayout(): React.JSX.Element {
         options={{
           title: t("nav.orders"),
           tabBarIcon: ({ color }) => <Text style={{ fontSize: 20, color }}>📦</Text>,
+          ...(unreadCount > 0 ? { tabBarBadge: unreadCount } : {}),
         }}
       />
       <Tabs.Screen
