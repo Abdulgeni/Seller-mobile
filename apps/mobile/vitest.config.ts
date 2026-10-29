@@ -8,6 +8,7 @@ export default defineConfig({
   test: {
     environment: "node",
     globals: true,
+    testTimeout: 15000,
     pool: "forks",
     poolOptions: {
       forks: {
@@ -44,6 +45,14 @@ export default defineConfig({
       {
         find: "expo-notifications",
         replacement: path.resolve(__dirname, "src/__tests__/notifications-shim.ts"),
+      },
+      {
+        find: "expo-local-authentication",
+        replacement: path.resolve(__dirname, "src/__tests__/security-shim.ts"),
+      },
+      {
+        find: "expo-secure-store",
+        replacement: path.resolve(__dirname, "src/__tests__/security-shim.ts"),
       },
     ],
   },

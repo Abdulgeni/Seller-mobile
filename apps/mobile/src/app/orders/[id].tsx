@@ -11,6 +11,7 @@ import {
   type OrderStatus,
 } from "@repo/schemas";
 import { Badge, Button, Card, EmptyState, Skeleton, t, tokens } from "@repo/ui";
+import { PaymentSheetModal } from "../../features/payments/PaymentSheetModal";
 
 const getBadgeVariant = (status: OrderStatus): "new" | "accepted" | "packed" | "shipped" | "delivered" | "cancelled" => {
   switch (status) {
@@ -27,7 +28,7 @@ export default function OrderDetailScreen(): React.JSX.Element {
   const params = useLocalSearchParams<{ id?: string; action?: string }>();
   const orderId = params.id ?? "";
   const queryClient = useQueryClient();
-  const [paymentInProgress, setPaymentInProgress] = useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
   const hasAutoAcceptedRef = useRef(false);
 
   const { data: order, isLoading, isError, error, refetch } = useQuery({
@@ -105,30 +106,8 @@ export default function OrderDetailScreen(): React.JSX.Element {
     },
   });
 
-  const handleSimulateMpesaCollect = async () => {
-    if (!order) return;
-    setPaymentInProgress(true);
-    try {
-      const tx = await defaultApiClient.initiatePayment({
-        orderId: order.id,
-        vendorId: order.vendorId,
-        amount: order.total,
-        currency: order.currency,
-        customerPhone: order.customer.phone,
-        idempotencyKey: `pay_${order.id}_${Date.now()}`,
-      });
-
-      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
-      Alert.alert(
-        "M-Pesa STK Push Sent",
-        `Sent request for ${order.currency} ${order.total} to ${order.customer.phone}.\nStatus: ${tx.state}`
-      );
-    } catch (err) {
-      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error).catch(() => {});
-      Alert.alert("Payment Error", err instanceof Error ? err.message : "Failed to initiate payment");
-    } finally {
-      setPaymentInProgress(false);
-    }
+  const handleSimulateMpesaCollect = () => {
+    setShowPaymentModal(true);
   };
 
   useEffect(() => {
@@ -193,7 +172,6 @@ export default function OrderDetailScreen(): React.JSX.Element {
           <Button
             title={`Collect Payment (${order.currency} ${order.total})`}
             variant="outline"
-            loading={paymentInProgress}
             onPress={handleSimulateMpesaCollect}
           />
         </View>
@@ -258,6 +236,17 @@ export default function OrderDetailScreen(): React.JSX.Element {
             })}
           </View>
         </View>
+      )}
+
+      {order && (
+        <PaymentSheetModal
+          order={order}
+          visible={showPaymentModal}
+          onClose={() => setShowPaymentModal(false)}
+          onSuccess={() => {
+            void queryClient.invalidateQueries({ queryKey: queryKeys.orders.detail(orderId) });
+          }}
+        />
       )}
     </ScrollView>
   );
