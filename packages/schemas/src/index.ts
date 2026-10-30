@@ -6,3 +6,4 @@ export * from "./payment";
 export * from "./payment-state-machine";
 export * from "./notification";
 export * from "./dashboard";
+export * from "./ai-studio";

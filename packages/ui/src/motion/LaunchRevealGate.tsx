@@ -72,7 +72,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   overlay: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     backgroundColor: tokens.colors.light.bgCanvas,
     alignItems: "center",
     justifyContent: "center",

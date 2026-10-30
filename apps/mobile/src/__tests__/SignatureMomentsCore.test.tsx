@@ -34,6 +34,8 @@ describe("Loop 2: Signature Moments Core", () => {
     // Enqueue mutation to verify syncQueue subscriber behavior
     syncQueue.enqueue({
       type: "PRODUCT_STOCK_TOGGLE",
+      method: "PATCH",
+      endpoint: "/api/products/p_l2_test/stock",
       payload: { productId: "p_l2_test", inStock: false },
       idempotencyKey: "test-l2-key",
     });

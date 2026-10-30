@@ -24,6 +24,7 @@ import {
   View,
 } from "react-native";
 import { z } from "zod";
+import { AIStudioLightboxModal } from "../../features/camera/AIStudioLightboxModal";
 import { compressProductPhoto } from "../../features/camera/compression";
 import { defaultDraftStorage } from "../../features/products/draftStorage";
 import { generateVariantMatrix } from "../../features/products/variants";
@@ -58,6 +59,7 @@ export default function CreateProductScreen(): React.JSX.Element {
   const [isProcessingPhoto, setIsProcessingPhoto] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
   const [hasRestoredDraft, setHasRestoredDraft] = useState(false);
+  const [aiStudioPhoto, setAiStudioPhoto] = useState<{ uri: string; id: string } | null>(null);
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const queryClient = useQueryClient();
@@ -351,6 +353,12 @@ export default function CreateProductScreen(): React.JSX.Element {
                   </Text>
                 </View>
                 <View style={styles.photoActions}>
+                  <TouchableOpacity
+                    onPress={() => setAiStudioPhoto({ uri: item.uri, id: item.id })}
+                    style={styles.actionBtn}
+                  >
+                    <Text style={styles.actionBtnText}>✨ AI Studio</Text>
+                  </TouchableOpacity>
                   {!item.isCover && (
                     <TouchableOpacity
                       onPress={() => handleSetCover(item.id)}
@@ -571,6 +579,21 @@ export default function CreateProductScreen(): React.JSX.Element {
         title="Create Product"
         loading={createMutation.isPending}
         onPress={handlePressSubmit}
+      />
+
+      <AIStudioLightboxModal
+        visible={!!aiStudioPhoto}
+        imageUri={aiStudioPhoto?.uri ?? null}
+        onClose={() => setAiStudioPhoto(null)}
+        onApply={(enhancedUri) => {
+          setPhotos((prev) =>
+            prev.map((p) =>
+              p.id === aiStudioPhoto?.id
+                ? { ...p, uri: enhancedUri, thumbnailUri: enhancedUri }
+                : p
+            )
+          );
+        }}
       />
     </ScrollView>
   );
