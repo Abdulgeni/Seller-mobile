@@ -6,7 +6,7 @@ import { Alert, Modal, Pressable, StyleSheet, Text, View } from "react-native";
 import { FlashList } from "@shopify/flash-list";
 import { defaultApiClient, queryKeys } from "@repo/api";
 import type { Product, ProductCategory } from "@repo/schemas";
-import { Button, Card, EmptyState, Input, Skeleton, t, tokens } from "@repo/ui";
+import { Button, Card, EmptyState, hapticFeedback, Input, Skeleton, t, tokens } from "@repo/ui";
 import { ProductRowItem } from "../../features/products/ProductRowItem";
 
 const CATEGORY_CHIPS: { label: string; value?: ProductCategory | undefined }[] = [
@@ -24,6 +24,13 @@ export default function ProductsScreen(): React.JSX.Element {
   const [search, setSearch] = useState("");
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [newPriceText, setNewPriceText] = useState("");
+
+  // Bulk Multi-Select state
+  const [isSelectMode, setIsSelectMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [isBatchPriceModalVisible, setIsBatchPriceModalVisible] = useState(false);
+  const [batchPriceText, setBatchPriceText] = useState("");
+
   const queryClient = useQueryClient();
 
   const queryFilters = {
@@ -68,7 +75,7 @@ export default function ProductsScreen(): React.JSX.Element {
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error).catch(() => {});
       Alert.alert(
         "Stock Update Failed",
-        err.message || "Could not update stock status. Rolled back."
+        err.message || "Failed to update stock status. Rolled back."
       );
     },
     onSuccess: () => {
@@ -142,15 +149,118 @@ export default function ProductsScreen(): React.JSX.Element {
     setEditingProduct(null);
   };
 
+  const handleToggleSelectId = useCallback((id: string) => {
+    setSelectedIds((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+    );
+  }, []);
+
+  const handleSelectAll = useCallback(() => {
+    hapticFeedback.selection();
+    if (selectedIds.length === products.length) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(products.map((p) => p.id));
+    }
+  }, [selectedIds.length, products]);
+
+  const handleBatchToggleStock = useCallback(
+    async (inStock: boolean) => {
+      if (selectedIds.length === 0) return;
+      hapticFeedback.buttonPress();
+
+      const previous = queryClient.getQueryData<Product[]>(queryKeys.products.list(queryFilters));
+      if (previous) {
+        queryClient.setQueryData<Product[]>(
+          queryKeys.products.list(queryFilters),
+          previous.map((p) => (selectedIds.includes(p.id) ? { ...p, inStock } : p))
+        );
+      }
+
+      try {
+        await Promise.all(
+          selectedIds.map((id) =>
+            defaultApiClient.toggleProductStock({
+              productId: id,
+              inStock,
+              idempotencyKey: `batch_stock_${id}_${Date.now()}`,
+            })
+          )
+        );
+        hapticFeedback.success();
+        setIsSelectMode(false);
+        setSelectedIds([]);
+      } catch {
+        if (previous) {
+          queryClient.setQueryData(queryKeys.products.list(queryFilters), previous);
+        }
+        hapticFeedback.warning();
+        Alert.alert("Batch Update Failed", "Failed to update selected items. Rolled back.");
+      } finally {
+        void queryClient.invalidateQueries({ queryKey: queryKeys.products.lists() });
+      }
+    },
+    [selectedIds, queryClient, queryFilters]
+  );
+
+  const handleBatchAdjustPrice = useCallback(async () => {
+    const numPrice = Number(batchPriceText);
+    if (isNaN(numPrice) || numPrice <= 0 || selectedIds.length === 0) {
+      Alert.alert("Invalid Input", "Please enter a valid positive price.");
+      return;
+    }
+    hapticFeedback.buttonPress();
+    setIsBatchPriceModalVisible(false);
+
+    const previous = queryClient.getQueryData<Product[]>(queryKeys.products.list(queryFilters));
+    if (previous) {
+      queryClient.setQueryData<Product[]>(
+        queryKeys.products.list(queryFilters),
+        previous.map((p) => (selectedIds.includes(p.id) ? { ...p, price: numPrice } : p))
+      );
+    }
+
+    try {
+      await Promise.all(
+        selectedIds.map((id) =>
+          defaultApiClient.editProductPrice({
+            productId: id,
+            price: numPrice,
+            idempotencyKey: `batch_price_${id}_${Date.now()}`,
+          })
+        )
+      );
+      hapticFeedback.success();
+      setIsSelectMode(false);
+      setSelectedIds([]);
+      setBatchPriceText("");
+    } catch {
+      if (previous) {
+        queryClient.setQueryData(queryKeys.products.list(queryFilters), previous);
+      }
+      hapticFeedback.warning();
+      Alert.alert("Batch Price Failed", "Failed to update prices. Rolled back.");
+    } finally {
+      void queryClient.invalidateQueries({ queryKey: queryKeys.products.lists() });
+    }
+  }, [batchPriceText, selectedIds, queryClient, queryFilters]);
+
   const renderItem = useCallback(
     ({ item }: { item: Product }) => (
       <ProductRowItem
         product={item}
         onToggleStock={handleToggleStock}
         onQuickEditPrice={handleQuickEditPrice}
+        isSelectMode={isSelectMode}
+        isSelected={selectedIds.includes(item.id)}
+        onSelect={handleToggleSelectId}
+        onLongPress={() => {
+          setIsSelectMode(true);
+          setSelectedIds([item.id]);
+        }}
       />
     ),
-    [handleToggleStock, handleQuickEditPrice]
+    [handleToggleStock, handleQuickEditPrice, isSelectMode, selectedIds, handleToggleSelectId]
   );
 
   const keyExtractor = useCallback((item: Product) => item.id, []);
@@ -165,12 +275,37 @@ export default function ProductsScreen(): React.JSX.Element {
             onChangeText={setSearch}
           />
         </View>
-        <View style={{ width: tokens.spacing.sm }} />
+        <View style={{ width: tokens.spacing.xs }} />
+        <Button
+          title={isSelectMode ? "Done" : "Select"}
+          variant={isSelectMode ? "secondary" : "ghost"}
+          onPress={() => {
+            hapticFeedback.selection();
+            setIsSelectMode(!isSelectMode);
+            setSelectedIds([]);
+          }}
+        />
+        <View style={{ width: tokens.spacing.xs }} />
         <Button
           title="+ New"
           onPress={() => router.push("/products/create")}
         />
       </View>
+
+      {/* Bulk Selection Header */}
+      {isSelectMode && (
+        <View style={styles.selectHeader}>
+          <Text style={styles.selectCountText}>
+            {selectedIds.length} of {products.length} selected
+          </Text>
+          <Button
+            title={selectedIds.length === products.length ? "Deselect All" : "Select All"}
+            variant="ghost"
+            size="sm"
+            onPress={handleSelectAll}
+          />
+        </View>
+      )}
 
       {/* Category Filter Chips */}
       <View style={styles.chipRow}>
@@ -218,62 +353,106 @@ export default function ProductsScreen(): React.JSX.Element {
           actionTitle={t("common.retry")}
           onAction={() => refetch()}
         />
-      ) : products.length === 0 ? (
-        <EmptyState
-          title={t("products.empty")}
-          actionTitle="+ Add Product"
-          onAction={() => router.push("/products/create")}
-        />
       ) : (
         <FlashList
           data={products}
           renderItem={renderItem}
           keyExtractor={keyExtractor}
-          contentContainerStyle={{ paddingBottom: tokens.spacing.xl }}
+          estimatedItemSize={92}
+          contentContainerStyle={styles.listContent}
+          ListEmptyComponent={
+            <EmptyState
+              title={t("products.noProducts")}
+              description={t("products.noProductsDescription")}
+              actionTitle="+ Add Product"
+              onAction={() => router.push("/products/create")}
+            />
+          }
         />
       )}
 
-      {/* Inline Quick Price Edit Modal */}
-      {editingProduct && (
-        <Modal
-          visible
-          transparent
-          animationType="fade"
-          onRequestClose={() => setEditingProduct(null)}
-        >
-          <View style={styles.modalOverlay}>
-            <Card style={styles.modalContent}>
-              <Text style={styles.modalTitle}>Quick Price Edit</Text>
-              <Text style={styles.modalSubtitle} numberOfLines={1}>
-                {editingProduct.title}
-              </Text>
-              <Input
-                label={`New Price (${editingProduct.currency})`}
-                value={newPriceText}
-                onChangeText={setNewPriceText}
-                keyboardType="numeric"
-                autoFocus
-              />
-              <View style={styles.modalButtons}>
-                <View style={{ flex: 1 }}>
-                  <Button
-                    title="Cancel"
-                    variant="outline"
-                    onPress={() => setEditingProduct(null)}
-                  />
-                </View>
-                <View style={{ flex: 1 }}>
-                  <Button
-                    title="Save Price"
-                    loading={priceMutation.isPending}
-                    onPress={handleSavePrice}
-                  />
-                </View>
-              </View>
-            </Card>
-          </View>
-        </Modal>
+      {/* Batch Operations Floating Bar */}
+      {isSelectMode && selectedIds.length > 0 && (
+        <View style={styles.batchBar}>
+          <Button
+            title="In Stock"
+            variant="secondary"
+            size="sm"
+            onPress={() => handleBatchToggleStock(true)}
+          />
+          <Button
+            title="Out Stock"
+            variant="secondary"
+            size="sm"
+            onPress={() => handleBatchToggleStock(false)}
+          />
+          <Button
+            title="Set Price"
+            variant="primary"
+            size="sm"
+            onPress={() => setIsBatchPriceModalVisible(true)}
+          />
+        </View>
       )}
+
+      {/* Quick Edit Single Price Modal */}
+      <Modal visible={!!editingProduct} transparent animationType="fade">
+        <View style={styles.modalOverlay}>
+          <Card style={styles.modalCard}>
+            <Text style={styles.modalTitle}>Edit Price</Text>
+            <Text style={styles.modalSubtitle}>{editingProduct?.title}</Text>
+            <Input
+              value={newPriceText}
+              onChangeText={setNewPriceText}
+              keyboardType="numeric"
+              placeholder="Enter new price in KES"
+            />
+            <View style={styles.modalButtons}>
+              <Button
+                title={t("common.cancel")}
+                variant="secondary"
+                onPress={() => setEditingProduct(null)}
+              />
+              <View style={{ width: tokens.spacing.sm }} />
+              <Button
+                title={t("common.save")}
+                loading={priceMutation.isPending}
+                onPress={handleSavePrice}
+              />
+            </View>
+          </Card>
+        </View>
+      </Modal>
+
+      {/* Batch Price Adjustment Modal */}
+      <Modal visible={isBatchPriceModalVisible} transparent animationType="fade">
+        <View style={styles.modalOverlay}>
+          <Card style={styles.modalCard}>
+            <Text style={styles.modalTitle}>Batch Adjust Price</Text>
+            <Text style={styles.modalSubtitle}>
+              Applying to {selectedIds.length} selected items
+            </Text>
+            <Input
+              value={batchPriceText}
+              onChangeText={setBatchPriceText}
+              keyboardType="numeric"
+              placeholder="New unit price in KES"
+            />
+            <View style={styles.modalButtons}>
+              <Button
+                title={t("common.cancel")}
+                variant="secondary"
+                onPress={() => setIsBatchPriceModalVisible(false)}
+              />
+              <View style={{ width: tokens.spacing.sm }} />
+              <Button
+                title="Apply to All"
+                onPress={handleBatchAdjustPrice}
+              />
+            </View>
+          </Card>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -281,70 +460,109 @@ export default function ProductsScreen(): React.JSX.Element {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: tokens.colors.light.bgCanvas,
     padding: tokens.spacing.md,
-    backgroundColor: tokens.colors.light.background,
   },
   topRow: {
     flexDirection: "row",
     alignItems: "center",
+    marginBottom: tokens.spacing.sm,
+  },
+  selectHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    backgroundColor: tokens.colors.light.bgSurface,
+    paddingHorizontal: tokens.spacing.sm,
+    paddingVertical: tokens.spacing.xs,
+    borderRadius: tokens.radii.sm,
+    borderWidth: 1,
+    borderColor: tokens.colors.light.borderSubtle,
+    marginBottom: tokens.spacing.xs,
+  },
+  selectCountText: {
+    fontSize: 12,
+    fontWeight: "700",
+    color: tokens.colors.light.accent,
   },
   chipRow: {
     flexDirection: "row",
-    flexWrap: "wrap",
     gap: tokens.spacing.xs,
-    marginVertical: tokens.spacing.sm,
+    marginBottom: tokens.spacing.sm,
+    flexWrap: "wrap",
   },
   chip: {
     paddingHorizontal: tokens.spacing.sm,
     paddingVertical: tokens.spacing.xs,
     borderRadius: tokens.radii.full,
-    backgroundColor: tokens.colors.light.surfaceSubtle,
+    backgroundColor: tokens.colors.light.bgRaised,
     borderWidth: 1,
-    borderColor: tokens.colors.light.border,
-    minHeight: 28,
-    justifyContent: "center",
+    borderColor: tokens.colors.light.borderSubtle,
   },
   chipText: {
     fontSize: 12,
-    fontWeight: "500",
+    fontWeight: "600",
     color: tokens.colors.light.contentSecondary,
   },
   staleBanner: {
-    backgroundColor: tokens.colors.light.surfaceSubtle,
-    paddingVertical: tokens.spacing.xs,
+    backgroundColor: tokens.colors.light.bgRaised,
     paddingHorizontal: tokens.spacing.sm,
+    paddingVertical: 4,
     borderRadius: tokens.radii.sm,
-    marginBottom: tokens.spacing.xs,
-    borderLeftWidth: 3,
-    borderLeftColor: tokens.colors.light.primary,
+    marginBottom: tokens.spacing.sm,
+    borderWidth: 1,
+    borderColor: tokens.colors.light.borderSubtle,
   },
   staleText: {
     fontSize: 11,
     color: tokens.colors.light.contentSecondary,
     fontWeight: "500",
   },
+  listContent: {
+    paddingBottom: tokens.spacing.xl,
+  },
+  batchBar: {
+    position: "absolute",
+    bottom: tokens.spacing.lg,
+    left: tokens.spacing.md,
+    right: tokens.spacing.md,
+    backgroundColor: tokens.colors.light.bgSurface,
+    padding: tokens.spacing.sm,
+    borderRadius: tokens.radii.lg,
+    borderWidth: 1,
+    borderColor: tokens.colors.light.borderStrong,
+    flexDirection: "row",
+    justifyContent: "space-around",
+    alignItems: "center",
+    shadowColor: tokens.colors.light.contentPrimary,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.15,
+    shadowRadius: 16,
+    elevation: tokens.elevation.card,
+  },
   modalOverlay: {
     flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    backgroundColor: tokens.colors.light.bgOverlay,
     justifyContent: "center",
     padding: tokens.spacing.lg,
   },
-  modalContent: {
-    padding: tokens.spacing.lg,
-    gap: tokens.spacing.md,
+  modalCard: {
+    backgroundColor: tokens.colors.light.bgCanvas,
   },
   modalTitle: {
-    fontSize: 17,
+    fontSize: 18,
     fontWeight: "700",
     color: tokens.colors.light.contentPrimary,
+    marginBottom: tokens.spacing.xs,
   },
   modalSubtitle: {
     fontSize: 13,
     color: tokens.colors.light.contentSecondary,
+    marginBottom: tokens.spacing.md,
   },
   modalButtons: {
     flexDirection: "row",
-    gap: tokens.spacing.sm,
-    marginTop: tokens.spacing.sm,
+    justifyContent: "flex-end",
+    marginTop: tokens.spacing.md,
   },
 });

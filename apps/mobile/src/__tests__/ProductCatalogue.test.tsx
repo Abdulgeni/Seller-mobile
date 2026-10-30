@@ -101,4 +101,34 @@ describe("F1 Product Catalogue (5k Items & Optimistic Mutations)", () => {
     );
     expect(qc.getQueryData<Product[]>(listKey)![0]!.price).toBe(2999);
   });
+
+  it("Loop 5: performs atomic bulk multi-select stock toggle and rollback", () => {
+    const qc = new QueryClient();
+    const listKey = queryKeys.products.lists();
+    const products: Product[] = [
+      { ...sampleProduct, id: "prod_1", inStock: true },
+      { ...sampleProduct, id: "prod_2", inStock: true },
+      { ...sampleProduct, id: "prod_3", inStock: false },
+    ];
+
+    qc.setQueryData<Product[]>(listKey, products);
+    const snapshot = qc.getQueryData<Product[]>(listKey)!;
+
+    const selectedIds = ["prod_1", "prod_2"];
+    // Optimistic batch mark out of stock
+    qc.setQueryData<Product[]>(
+      listKey,
+      snapshot.map((p) => (selectedIds.includes(p.id) ? { ...p, inStock: false } : p))
+    );
+
+    const updated = qc.getQueryData<Product[]>(listKey)!;
+    expect(updated[0]!.inStock).toBe(false);
+    expect(updated[1]!.inStock).toBe(false);
+
+    // Rollback
+    qc.setQueryData(listKey, snapshot);
+    const reverted = qc.getQueryData<Product[]>(listKey)!;
+    expect(reverted[0]!.inStock).toBe(true);
+    expect(reverted[1]!.inStock).toBe(true);
+  });
 });
