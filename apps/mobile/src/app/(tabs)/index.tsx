@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
@@ -15,8 +15,10 @@ import {
   tokens,
 } from "@repo/ui";
 import { useCommandPaletteStore } from "../../features/command/commandStore";
+import { StorefrontPreviewModal } from "../../features/storefront/StorefrontPreviewModal";
 
 export default function DashboardScreen(): React.JSX.Element {
+  const [showStorefrontPreview, setShowStorefrontPreview] = useState(false);
   const { data: kpis, isLoading, isError, error, refetch } = useQuery({
     queryKey: queryKeys.dashboard.kpis(),
     queryFn: () => defaultApiClient.getDashboardKpis(),
@@ -212,6 +214,12 @@ export default function DashboardScreen(): React.JSX.Element {
         />
         <View style={{ width: tokens.spacing.sm }} />
         <Button
+          title="✦ Buyer View"
+          variant="gold"
+          onPress={() => setShowStorefrontPreview(true)}
+        />
+        <View style={{ width: tokens.spacing.sm }} />
+        <Button
           title="Payouts"
           variant="secondary"
           onPress={() => router.push("/payouts")}
@@ -223,6 +231,11 @@ export default function DashboardScreen(): React.JSX.Element {
           onPress={() => useCommandPaletteStore.getState().open()}
         />
       </View>
+
+      <StorefrontPreviewModal
+        visible={showStorefrontPreview}
+        onClose={() => setShowStorefrontPreview(false)}
+      />
     </ScrollView>
   );
 }

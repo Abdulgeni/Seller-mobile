@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   FlatList,
@@ -339,11 +339,11 @@ const styles = StyleSheet.create({
   },
   bubbleSeller: {
     backgroundColor: tokens.colors.light.accent,
-    borderBottomRightRadius: tokens.radii.xs,
+    borderBottomRightRadius: tokens.radii.sm,
   },
   bubbleCustomer: {
     backgroundColor: tokens.colors.light.bgRaised,
-    borderBottomLeftRadius: tokens.radii.xs,
+    borderBottomLeftRadius: tokens.radii.sm,
     borderWidth: 1,
     borderColor: tokens.colors.light.borderSubtle,
   },

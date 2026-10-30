@@ -1,13 +1,25 @@
 import React, { useEffect, useState } from "react";
 import { Animated, StyleSheet, Text, View } from "react-native";
-import { type PaymentTransaction } from "@repo/schemas";
 import { Button } from "../components";
 import { hapticFeedback } from "../haptics";
 import { useReducedMotion } from "./index";
 import { tokens } from "../tokens";
 
+export interface ReceiptTransaction {
+  id: string;
+  amount: number;
+  currency: string;
+  state: string;
+  checkoutRequestId?: string | undefined;
+  receiptNumber?: string | null | undefined;
+  completedAt?: string | null | undefined;
+  createdAt?: string | null | undefined;
+  failureReason?: string | null | undefined;
+  [key: string]: unknown;
+}
+
 export interface PaymentVaultReceiptRiseProps {
-  transaction: PaymentTransaction;
+  transaction: ReceiptTransaction;
   onShare: () => void;
   onDone: () => void;
 }
@@ -88,7 +100,7 @@ export function PaymentVaultReceiptRise({
         <View style={styles.detailRow}>
           <Text style={styles.detailLabel}>Timestamp</Text>
           <Text style={styles.detailValue}>
-            {new Date(transaction.createdAt).toLocaleTimeString()}
+            {new Date(transaction.createdAt ?? transaction.completedAt ?? Date.now()).toLocaleTimeString()}
           </Text>
         </View>
         <View style={styles.detailRow}>

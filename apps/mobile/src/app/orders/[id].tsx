@@ -21,6 +21,7 @@ import {
   tokens,
 } from "@repo/ui";
 import { CustomerMessagesModal } from "../../features/messages/CustomerMessagesModal";
+import { PackingSlipExportModal } from "../../features/orders/PackingSlipExportModal";
 import { PaymentSheetModal } from "../../features/payments/PaymentSheetModal";
 
 const getBadgeVariant = (status: OrderStatus): "new" | "accepted" | "packed" | "shipped" | "delivered" | "cancelled" => {
@@ -40,6 +41,7 @@ export default function OrderDetailScreen(): React.JSX.Element {
   const queryClient = useQueryClient();
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [showMessagesModal, setShowMessagesModal] = useState(false);
+  const [showPackingSlipModal, setShowPackingSlipModal] = useState(false);
   const hasAutoAcceptedRef = useRef(false);
 
   const { data: order, isLoading, isError, error, refetch } = useQuery({
@@ -178,12 +180,20 @@ export default function OrderDetailScreen(): React.JSX.Element {
       <Card>
         <View style={styles.rowBetween}>
           <Text style={styles.cardHeading}>{t("orders.customer")}</Text>
-          <Button
-            title="💬 Message"
-            size="sm"
-            variant="outline"
-            onPress={() => setShowMessagesModal(true)}
-          />
+          <View style={{ flexDirection: "row", gap: tokens.spacing.xs }}>
+            <Button
+              title="📄 Slip"
+              size="sm"
+              variant="outline"
+              onPress={() => setShowPackingSlipModal(true)}
+            />
+            <Button
+              title="💬 Message"
+              size="sm"
+              variant="outline"
+              onPress={() => setShowMessagesModal(true)}
+            />
+          </View>
         </View>
         <Text style={styles.customerName}>{order.customer.name}</Text>
         <Text style={styles.customerDetail}>📞 {order.customer.phone}</Text>
@@ -275,6 +285,14 @@ export default function OrderDetailScreen(): React.JSX.Element {
           order={order}
           visible={showMessagesModal}
           onClose={() => setShowMessagesModal(false)}
+        />
+      )}
+
+      {order && (
+        <PackingSlipExportModal
+          order={order}
+          visible={showPackingSlipModal}
+          onClose={() => setShowPackingSlipModal(false)}
         />
       )}
     </ScrollView>
