@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { defaultApiClient, queryKeys } from "@repo/api";
-import { Button, Card, EmptyState, Skeleton, t, tokens } from "@repo/ui";
+import { Button, Card, EmptyState, NumericRoll, Skeleton, t, tokens } from "@repo/ui";
 
 export default function DashboardScreen(): React.JSX.Element {
   const { data: kpis, isLoading, isError, error, refetch } = useQuery({
@@ -44,9 +44,11 @@ export default function DashboardScreen(): React.JSX.Element {
       <View style={styles.kpiGrid}>
         <Card style={styles.kpiCard}>
           <Text style={styles.kpiLabel}>{t("dashboard.revenueToday")}</Text>
-          <Text style={styles.kpiValue}>
-            {kpis.currency} {kpis.revenueToday.toLocaleString()}
-          </Text>
+          <NumericRoll
+            value={kpis.revenueToday}
+            prefix={`${kpis.currency} `}
+            style={styles.kpiValue}
+          />
           <Text style={[styles.kpiSubtext, { color: tokens.colors.light.success }]}>
             +{kpis.revenueChangePercent}% vs yesterday
           </Text>
@@ -54,7 +56,10 @@ export default function DashboardScreen(): React.JSX.Element {
 
         <Card style={styles.kpiCard}>
           <Text style={styles.kpiLabel}>{t("dashboard.ordersToday")}</Text>
-          <Text style={styles.kpiValue}>{kpis.ordersTodayCount}</Text>
+          <NumericRoll
+            value={kpis.ordersTodayCount}
+            style={styles.kpiValue}
+          />
           <Text style={styles.kpiSubtext}>
             {kpis.ordersPendingAcceptanceCount} awaiting acceptance
           </Text>
@@ -64,17 +69,20 @@ export default function DashboardScreen(): React.JSX.Element {
       <View style={styles.kpiGrid}>
         <Card style={styles.kpiCard}>
           <Text style={styles.kpiLabel}>{t("dashboard.lowStock")}</Text>
-          <Text style={[styles.kpiValue, { color: tokens.colors.light.danger }]}>
-            {kpis.lowStockItemsCount}
-          </Text>
+          <NumericRoll
+            value={kpis.lowStockItemsCount}
+            style={[styles.kpiValue, { color: tokens.colors.light.danger }]}
+          />
           <Text style={styles.kpiSubtext}>Needs re-order</Text>
         </Card>
 
         <Card style={styles.kpiCard}>
           <Text style={styles.kpiLabel}>{t("dashboard.pendingPayouts")}</Text>
-          <Text style={styles.kpiValue}>
-            {kpis.currency} {kpis.pendingPayoutAmount.toLocaleString()}
-          </Text>
+          <NumericRoll
+            value={kpis.pendingPayoutAmount}
+            prefix={`${kpis.currency} `}
+            style={styles.kpiValue}
+          />
           <Text style={[styles.kpiSubtext, { color: tokens.colors.light.primary }]}>
             Biometric protected
           </Text>

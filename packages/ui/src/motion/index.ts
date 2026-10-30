@@ -38,3 +38,6 @@ export const physicalSpringConfig = motionTokens.springs.physical;
 export const pressSpringConfig = motionTokens.springs.press;
 export const popSpringConfig = motionTokens.springs.pop;
 export const motionDurations = motionTokens.durations;
+
+export * from "./NumericRoll";
+export * from "./LaunchRevealGate";
