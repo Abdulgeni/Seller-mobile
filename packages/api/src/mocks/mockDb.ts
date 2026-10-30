@@ -6,6 +6,7 @@ import {
 } from "./fixtures";
 import {
   canTransitionOrder,
+  type CustomerMessage,
   type Order,
   type OrderStatus,
   type PaymentInitiationRequest,
@@ -18,6 +19,7 @@ export interface MockDbState {
   orders: Order[];
   dashboard: ReturnType<typeof generateSeedDashboardMetrics>;
   transactions: PaymentTransaction[];
+  messages: Record<string, CustomerMessage[]>;
   idempotencyLog: Map<string, { status: number; body: Record<string, unknown> | Array<unknown> }>;
 }
 
@@ -26,6 +28,18 @@ export const mockDb: MockDbState = {
   orders: generateSeedOrders(),
   dashboard: generateSeedDashboardMetrics(),
   transactions: generateSeedTransactions(),
+  messages: {
+    ord_1: [
+      {
+        id: "msg_1",
+        orderId: "ord_1",
+        sender: "customer",
+        text: "Jambo! Could you please let me know if this order can be dispatched today?",
+        timestamp: "2026-10-28T09:30:00.000Z",
+        status: "delivered",
+      },
+    ],
+  },
   idempotencyLog: new Map(),
 };
 
@@ -34,6 +48,18 @@ export function resetMockDb(): void {
   mockDb.orders = generateSeedOrders();
   mockDb.dashboard = generateSeedDashboardMetrics();
   mockDb.transactions = generateSeedTransactions();
+  mockDb.messages = {
+    ord_1: [
+      {
+        id: "msg_1",
+        orderId: "ord_1",
+        sender: "customer",
+        text: "Jambo! Could you please let me know if this order can be dispatched today?",
+        timestamp: "2026-10-28T09:30:00.000Z",
+        status: "delivered",
+      },
+    ],
+  };
   mockDb.idempotencyLog.clear();
 }
 
@@ -392,6 +418,34 @@ export function handleMockRoute(
         ],
       },
     };
+  }
+
+  // 15. Order Messages GET
+  const orderMessagesGetMatch = pathname.match(/^\/orders\/([^/]+)\/messages$/);
+  if (orderMessagesGetMatch && method === "GET") {
+    const orderId = orderMessagesGetMatch[1]!;
+    const msgs = mockDb.messages[orderId] ?? [];
+    return { status: 200, body: msgs };
+  }
+
+  // 16. Order Messages POST
+  if (orderMessagesGetMatch && method === "POST") {
+    const orderId = orderMessagesGetMatch[1]!;
+    const body = JSON.parse((options.body as string) || "{}") as { text: string };
+    const newMsg: CustomerMessage = {
+      id: `msg_${Date.now()}`,
+      orderId,
+      sender: "seller",
+      text: body.text,
+      timestamp: new Date().toISOString(),
+      status: "delivered",
+    };
+
+    if (!mockDb.messages[orderId]) {
+      mockDb.messages[orderId] = [];
+    }
+    mockDb.messages[orderId].push(newMsg);
+    return { status: 200, body: newMsg };
   }
 
   return { status: 404, body: { message: `Not Found: ${endpoint}` } };

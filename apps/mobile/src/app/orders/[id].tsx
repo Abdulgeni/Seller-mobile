@@ -11,6 +11,7 @@ import {
   type OrderStatus,
 } from "@repo/schemas";
 import { Badge, Button, Card, EmptyState, Skeleton, t, tokens } from "@repo/ui";
+import { CustomerMessagesModal } from "../../features/messages/CustomerMessagesModal";
 import { PaymentSheetModal } from "../../features/payments/PaymentSheetModal";
 
 const getBadgeVariant = (status: OrderStatus): "new" | "accepted" | "packed" | "shipped" | "delivered" | "cancelled" => {
@@ -29,6 +30,7 @@ export default function OrderDetailScreen(): React.JSX.Element {
   const orderId = params.id ?? "";
   const queryClient = useQueryClient();
   const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [showMessagesModal, setShowMessagesModal] = useState(false);
   const hasAutoAcceptedRef = useRef(false);
 
   const { data: order, isLoading, isError, error, refetch } = useQuery({
@@ -163,7 +165,15 @@ export default function OrderDetailScreen(): React.JSX.Element {
 
       {/* Customer Information */}
       <Card>
-        <Text style={styles.cardHeading}>{t("orders.customer")}</Text>
+        <View style={styles.rowBetween}>
+          <Text style={styles.cardHeading}>{t("orders.customer")}</Text>
+          <Button
+            title="💬 Message"
+            size="sm"
+            variant="outline"
+            onPress={() => setShowMessagesModal(true)}
+          />
+        </View>
         <Text style={styles.customerName}>{order.customer.name}</Text>
         <Text style={styles.customerDetail}>📞 {order.customer.phone}</Text>
         <Text style={styles.customerDetail}>📍 {order.customer.shippingAddress}</Text>
@@ -246,6 +256,14 @@ export default function OrderDetailScreen(): React.JSX.Element {
           onSuccess={() => {
             void queryClient.invalidateQueries({ queryKey: queryKeys.orders.detail(orderId) });
           }}
+        />
+      )}
+
+      {order && (
+        <CustomerMessagesModal
+          order={order}
+          visible={showMessagesModal}
+          onClose={() => setShowMessagesModal(false)}
         />
       )}
     </ScrollView>

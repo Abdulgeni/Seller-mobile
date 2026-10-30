@@ -1,5 +1,6 @@
 import {
   AiSuggestionResponseSchema,
+  CustomerMessageSchema,
   DashboardKpiMetricsSchema,
   Insights2OverviewSchema,
   OrderFilterParamsSchema,
@@ -11,8 +12,10 @@ import {
   ProductDraftSchema,
   ProductSchema,
   RegisterFcmTokenRequestSchema,
+  SendMessageRequestSchema,
   StockToggleMutationSchema,
   type AiSuggestionResponse,
+  type CustomerMessage,
   type DashboardKpiMetrics,
   type Insights2Overview,
   type Order,
@@ -24,6 +27,7 @@ import {
   type Product,
   type ProductDraft,
   type RegisterFcmTokenRequest,
+  type SendMessageRequest,
   type StockToggleMutation,
 } from "@repo/schemas";
 import { logger } from "@repo/ui";
@@ -262,6 +266,24 @@ export class ApiClient {
   // Insights 2.0
   async getInsightsOverview(): Promise<Insights2Overview> {
     return this.request("/insights/overview", { method: "GET" }, Insights2OverviewSchema);
+  }
+
+  // Customer Messages
+  async getOrderMessages(orderId: string): Promise<CustomerMessage[]> {
+    return this.request(`/orders/${orderId}/messages`, { method: "GET" }, z.array(CustomerMessageSchema));
+  }
+
+  async sendMessage(req: SendMessageRequest): Promise<CustomerMessage> {
+    SendMessageRequestSchema.parse(req);
+    return this.request(
+      `/orders/${req.orderId}/messages`,
+      {
+        method: "POST",
+        body: JSON.stringify(req),
+        headers: { "Idempotency-Key": req.idempotencyKey },
+      },
+      CustomerMessageSchema
+    );
   }
 }
 

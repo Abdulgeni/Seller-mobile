@@ -39,4 +39,8 @@ export const queryKeys = {
     all: ["insights"] as const,
     overview: () => [...queryKeys.insights.all, "overview"] as const,
   },
+  messages: {
+    all: ["messages"] as const,
+    byOrder: (orderId: string) => [...queryKeys.messages.all, "by-order", orderId] as const,
+  },
 } as const;

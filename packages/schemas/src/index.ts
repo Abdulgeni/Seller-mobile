@@ -8,3 +8,4 @@ export * from "./notification";
 export * from "./dashboard";
 export * from "./ai-studio";
 export * from "./insights";
+export * from "./messages";
