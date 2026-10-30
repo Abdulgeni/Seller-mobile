@@ -10,7 +10,16 @@ import {
   type Order,
   type OrderStatus,
 } from "@repo/schemas";
-import { Badge, Button, Card, EmptyState, Skeleton, t, tokens } from "@repo/ui";
+import {
+  Badge,
+  Button,
+  Card,
+  EmptyState,
+  KineticStatusFlip,
+  Skeleton,
+  t,
+  tokens,
+} from "@repo/ui";
 import { CustomerMessagesModal } from "../../features/messages/CustomerMessagesModal";
 import { PaymentSheetModal } from "../../features/payments/PaymentSheetModal";
 
@@ -158,7 +167,9 @@ export default function OrderDetailScreen(): React.JSX.Element {
       <Card>
         <View style={styles.rowBetween}>
           <Text style={styles.orderNumber}>{order.orderNumber}</Text>
-          <Badge label={order.status} variant={getBadgeVariant(order.status)} />
+          <KineticStatusFlip status={order.status}>
+            <Badge label={order.status} variant={getBadgeVariant(order.status)} />
+          </KineticStatusFlip>
         </View>
         <Text style={styles.orderDate}>Placed on {new Date(order.createdAt).toLocaleDateString()}</Text>
       </Card>

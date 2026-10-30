@@ -10,7 +10,7 @@ import {
   View,
 } from "react-native";
 import type { Order, PaymentTransaction } from "@repo/schemas";
-import { Button, Card, Input, tokens } from "@repo/ui";
+import { Button, Card, Input, PaymentVaultReceiptRise, tokens } from "@repo/ui";
 import { defaultPaymentService } from "./paymentService";
 
 export interface PaymentSheetModalProps {
@@ -102,19 +102,11 @@ export function PaymentSheetModal({
           </View>
 
           {status === "SUCCESS" && completedTx ? (
-            <View style={styles.successContainer}>
-              <Text style={styles.successIcon}>✅</Text>
-              <Text style={styles.successTitle}>Payment Received!</Text>
-              <Text style={styles.receiptNo}>Receipt: {completedTx.receiptNumber ?? completedTx.checkoutRequestId}</Text>
-              <Text style={styles.successAmount}>
-                {completedTx.currency} {completedTx.amount.toLocaleString()}
-              </Text>
-
-              <View style={styles.buttonStack}>
-                <Button title="Share Receipt" variant="outline" onPress={handleShareReceipt} />
-                <Button title="Done" onPress={onClose} />
-              </View>
-            </View>
+            <PaymentVaultReceiptRise
+              transaction={completedTx}
+              onShare={handleShareReceipt}
+              onDone={onClose}
+            />
           ) : (
             <>
               <Text style={styles.amountPrompt}>

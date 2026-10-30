@@ -41,3 +41,5 @@ export const motionDurations = motionTokens.durations;
 
 export * from "./NumericRoll";
 export * from "./LaunchRevealGate";
+export * from "./PaymentVaultReceiptRise";
+export * from "./KineticStatusFlip";
