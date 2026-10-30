@@ -1,4 +1,5 @@
 import { logger } from "@repo/ui";
+import { isRunningInExpoGo } from "expo";
 import * as ImageManipulator from "expo-image-manipulator";
 
 export interface CompressionInput {
@@ -34,6 +35,9 @@ interface NativeCompressorModule {
 }
 
 function getNativeCompressor(): NativeCompressorModule | null {
+  if (isRunningInExpoGo()) {
+    return null;
+  }
   try {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const mod = require("react-native-compressor") as { Image?: NativeCompressorModule } | undefined;

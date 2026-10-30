@@ -1,11 +1,32 @@
 import { defaultApiClient } from "@repo/api";
 import { logger } from "@repo/ui";
+import { isRunningInExpoGo, requireOptionalNativeModule } from "expo";
 import type * as NotificationsType from "expo-notifications";
 import { Platform } from "react-native";
 import { parseAndValidateDeepLink } from "./deepLinks";
 import { useNotificationStore } from "./notificationStore";
 
+function hasNativeNotificationModule(): boolean {
+  if (isRunningInExpoGo()) {
+    return false;
+  }
+  if (Platform.OS === "android") {
+    try {
+      const topicModule = requireOptionalNativeModule("ExpoTopicSubscriptionModule");
+      if (!topicModule) {
+        return false;
+      }
+    } catch {
+      return false;
+    }
+  }
+  return true;
+}
+
 function getExpoNotifications(): typeof NotificationsType | null {
+  if (!hasNativeNotificationModule()) {
+    return null;
+  }
   try {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     return require("expo-notifications") as typeof NotificationsType;

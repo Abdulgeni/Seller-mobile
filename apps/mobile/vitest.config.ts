@@ -19,6 +19,10 @@ export default defineConfig({
   resolve: {
     alias: [
       {
+        find: /^expo$/,
+        replacement: path.resolve(__dirname, "src/__tests__/expo-shim.ts"),
+      },
+      {
         find: /^react-native$/,
         replacement: path.resolve(__dirname, "../../packages/api/src/mocks/react-native-shim.ts"),
       },
