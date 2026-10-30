@@ -21,12 +21,14 @@ const queryClient = new QueryClient({
 
 export default function RootLayout(): React.JSX.Element {
   useEffect(() => {
-    void initializeNotifications();
-    void hydrateAuthSession().then(() => {
-      useAuthStore.getState().resolvePendingDeepLink((targetRoute) => {
-        router.push(targetRoute as unknown as Parameters<typeof router.push>[0]);
-      });
-    });
+    void initializeNotifications().catch(() => {});
+    void hydrateAuthSession()
+      .then(() => {
+        useAuthStore.getState().resolvePendingDeepLink((targetRoute) => {
+          router.push(targetRoute as unknown as Parameters<typeof router.push>[0]);
+        });
+      })
+      .catch(() => {});
   }, []);
 
   return (

@@ -1,6 +1,5 @@
 import { logger } from "@repo/ui";
 import * as ImageManipulator from "expo-image-manipulator";
-import { Image as ImageCompressor } from "react-native-compressor";
 
 export interface CompressionInput {
   uri: string;
@@ -20,6 +19,32 @@ export interface CompressedImageResult {
 export const MAX_IMAGE_DIMENSION = 1600;
 export const MAX_FILE_SIZE_BYTES = 200 * 1024; // 200 KB
 export const THUMBNAIL_MAX_DIMENSION = 200;
+
+interface NativeCompressorModule {
+  compress: (
+    value: string,
+    options?: {
+      compressionMethod?: "auto" | "manual";
+      maxWidth?: number;
+      maxHeight?: number;
+      quality?: number;
+      returnableOutputType?: "uri" | "base64";
+    }
+  ) => Promise<string>;
+}
+
+function getNativeCompressor(): NativeCompressorModule | null {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const mod = require("react-native-compressor") as { Image?: NativeCompressorModule } | undefined;
+    if (mod && typeof mod.Image?.compress === "function") {
+      return mod.Image;
+    }
+  } catch {
+    // Native TurboModule / NitroModules not available in current runtime (e.g. standard Expo Go)
+  }
+  return null;
+}
 
 /**
  * Calculates new dimensions scaled to fit within maxDimension preserving aspect ratio.
@@ -64,9 +89,10 @@ export async function compressProductPhoto(
   let estimatedSizeBytes = input.fileSizeBytes ?? 150 * 1024;
 
   try {
+    const nativeCompressor = getNativeCompressor();
     // 1. Off-thread native compression via react-native-compressor
-    if (typeof ImageCompressor?.compress === "function") {
-      compressedUri = await ImageCompressor.compress(input.uri, {
+    if (nativeCompressor) {
+      compressedUri = await nativeCompressor.compress(input.uri, {
         compressionMethod: "auto",
         maxWidth: targetWidth,
         maxHeight: targetHeight,

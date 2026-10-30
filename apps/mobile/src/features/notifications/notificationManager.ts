@@ -1,9 +1,18 @@
 import { defaultApiClient } from "@repo/api";
 import { logger } from "@repo/ui";
-import * as Notifications from "expo-notifications";
+import type * as NotificationsType from "expo-notifications";
 import { Platform } from "react-native";
 import { parseAndValidateDeepLink } from "./deepLinks";
 import { useNotificationStore } from "./notificationStore";
+
+function getExpoNotifications(): typeof NotificationsType | null {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    return require("expo-notifications") as typeof NotificationsType;
+  } catch {
+    return null;
+  }
+}
 
 export const NOTIFICATION_CATEGORY_NEW_ORDER = "NEW_ORDER";
 export const ACTION_ACCEPT_ORDER = "ACCEPT_ORDER";
@@ -14,6 +23,12 @@ export const ACTION_VIEW_ORDER = "VIEW_ORDER";
  */
 export async function initializeNotifications(): Promise<void> {
   try {
+    const Notifications = getExpoNotifications();
+    if (!Notifications) {
+      logger.info("Expo notifications native module not available (e.g. running in Expo Go). Falling back to in-app notification harness.");
+      return;
+    }
+
     // 1. Configure foreground notification presentation behavior
     if (typeof Notifications.setNotificationHandler === "function") {
       Notifications.setNotificationHandler({
@@ -59,8 +74,17 @@ export async function initializeNotifications(): Promise<void> {
  */
 export async function registerDeviceToken(): Promise<string | null> {
   try {
-    if (typeof Notifications.getPermissionsAsync !== "function") {
-      return null;
+    const Notifications = getExpoNotifications();
+    const platform = Platform.OS === "android" ? "android" : Platform.OS === "ios" ? "ios" : "simulator";
+
+    if (!Notifications || typeof Notifications.getPermissionsAsync !== "function") {
+      logger.info("Push notification native module not available; registering mock dev token", { platform });
+      await defaultApiClient.registerPushToken({
+        token: "mock_fcm_token_dev_simulator",
+        devicePlatform: platform,
+        appVersion: "1.0.0",
+      });
+      return "mock_fcm_token_dev_simulator";
     }
 
     const { status: existingStatus } = await Notifications.getPermissionsAsync();
@@ -84,8 +108,6 @@ export async function registerDeviceToken(): Promise<string | null> {
       }
     }
 
-    const platform = Platform.OS === "android" ? "android" : Platform.OS === "ios" ? "ios" : "simulator";
-
     await defaultApiClient.registerPushToken({
       token,
       devicePlatform: platform,
@@ -104,7 +126,7 @@ export async function registerDeviceToken(): Promise<string | null> {
  * Handles notification response (action click or banner tap) with strict deep-link validation.
  */
 export function handleNotificationResponse(
-  response: Notifications.NotificationResponse,
+  response: NotificationsType.NotificationResponse,
   navigateFn: (route: string) => void
 ): boolean {
   const data = response.notification.request.content.data as Record<string, unknown> | undefined;
@@ -159,7 +181,8 @@ export async function simulateIncomingNewOrder(order: {
 
   useNotificationStore.getState().addNotification(payload);
 
-  if (typeof Notifications.scheduleNotificationAsync === "function") {
+  const Notifications = getExpoNotifications();
+  if (Notifications && typeof Notifications.scheduleNotificationAsync === "function") {
     try {
       await Notifications.scheduleNotificationAsync({
         content: {
