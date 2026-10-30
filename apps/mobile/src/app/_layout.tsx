@@ -9,6 +9,8 @@ import { CommandPaletteModal } from "../features/command/CommandPaletteModal";
 import { ForegroundNotificationBanner } from "../features/notifications/ForegroundNotificationBanner";
 import { initializeNotifications } from "../features/notifications/notificationManager";
 import { NotificationHarnessModal } from "../features/notifications/NotificationHarnessModal";
+import { OnboardingModal } from "../features/onboarding/OnboardingModal";
+import { SettingsModal } from "../features/settings/SettingsModal";
 import { SyncBanner } from "../features/sync/SyncBanner";
 
 const queryClient = new QueryClient({
@@ -56,6 +58,8 @@ export default function RootLayout(): React.JSX.Element {
             </Stack>
             <NotificationHarnessModal />
             <CommandPaletteModal />
+            <SettingsModal />
+            <OnboardingModal />
           </LaunchRevealGate>
         </SafeAreaView>
       </QueryClientProvider>

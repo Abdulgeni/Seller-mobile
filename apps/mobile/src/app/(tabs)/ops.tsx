@@ -4,6 +4,7 @@ import { router } from "expo-router";
 import { Alert, ScrollView, StyleSheet, Switch, Text, View } from "react-native";
 import { syncQueue } from "@repo/api";
 import { Button, Card, t, tokens } from "@repo/ui";
+import { useSettingsStore } from "../../features/settings/settingsStore";
 
 export default function OpsScreen(): React.JSX.Element {
   const [pendingCount, setPendingCount] = useState(0);
@@ -122,6 +123,19 @@ export default function OpsScreen(): React.JSX.Element {
           title="Simulate New Order Push"
           variant="outline"
           onPress={handleSimulateIncomingOrder}
+        />
+      </Card>
+
+      {/* Merchant Preferences & Settings */}
+      <Card>
+        <Text style={styles.cardTitle}>Merchant Preferences</Text>
+        <Text style={styles.cardDesc}>
+          Theme appearance, tactile engine, and onboarding tour walkthrough.
+        </Text>
+        <Button
+          title="Open Settings"
+          variant="outline"
+          onPress={() => useSettingsStore.getState().openSettings()}
         />
       </Card>
 

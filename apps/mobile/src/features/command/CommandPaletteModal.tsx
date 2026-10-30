@@ -13,6 +13,7 @@ import {
 import { createSyncExecutor, defaultApiClient, queryKeys, syncQueue } from "@repo/api";
 import { type Order, type Product } from "@repo/schemas";
 import { Badge, hapticFeedback, tokens } from "@repo/ui";
+import { useSettingsStore } from "../settings/settingsStore";
 import { useCommandPaletteStore } from "./commandStore";
 
 export interface CommandItem {
@@ -74,6 +75,26 @@ export function CommandPaletteModal(): React.JSX.Element | null {
         onSelect: () => {
           close();
           router.push("/payouts");
+        },
+      },
+      {
+        id: "act_settings",
+        category: "ACTION",
+        title: "Merchant Preferences & Settings",
+        subtitle: "Theme appearance, tactile engine, diagnostics",
+        onSelect: () => {
+          close();
+          useSettingsStore.getState().openSettings();
+        },
+      },
+      {
+        id: "act_onboarding",
+        category: "ACTION",
+        title: "✦ Atelier Welcome & Tour",
+        subtitle: "Replay 3-step luxury guide to AI Studio & Ops",
+        onSelect: () => {
+          close();
+          useSettingsStore.getState().openOnboarding();
         },
       },
       {
