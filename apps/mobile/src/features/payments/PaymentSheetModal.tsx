@@ -218,7 +218,7 @@ const styles = StyleSheet.create({
   },
   errorBox: {
     padding: tokens.spacing.sm,
-    backgroundColor: "#FEE2E2",
+    backgroundColor: tokens.colors.light.criticalSubtle,
     borderRadius: tokens.radii.sm,
   },
   errorText: {

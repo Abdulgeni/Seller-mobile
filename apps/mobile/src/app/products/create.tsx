@@ -644,7 +644,7 @@ const styles = StyleSheet.create({
     borderRadius: tokens.radii.sm,
   },
   coverBadgeText: {
-    color: "#FFFFFF",
+    color: tokens.colors.light.textInverse,
     fontSize: 10,
     fontWeight: "800",
   },
@@ -722,7 +722,7 @@ const styles = StyleSheet.create({
     fontWeight: "500",
   },
   chipTextSelected: {
-    color: "#FFFFFF",
+    color: tokens.colors.light.textInverse,
     fontWeight: "600",
   },
   inputPair: {
