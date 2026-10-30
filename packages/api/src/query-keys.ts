@@ -35,4 +35,8 @@ export const queryKeys = {
     list: () => [...queryKeys.notifications.all, "list"] as const,
     unreadCount: () => [...queryKeys.notifications.all, "unread-count"] as const,
   },
+  insights: {
+    all: ["insights"] as const,
+    overview: () => [...queryKeys.insights.all, "overview"] as const,
+  },
 } as const;

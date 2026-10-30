@@ -1,6 +1,7 @@
 import {
   AiSuggestionResponseSchema,
   DashboardKpiMetricsSchema,
+  Insights2OverviewSchema,
   OrderFilterParamsSchema,
   OrderSchema,
   OrderTransitionMutationSchema,
@@ -13,6 +14,7 @@ import {
   StockToggleMutationSchema,
   type AiSuggestionResponse,
   type DashboardKpiMetrics,
+  type Insights2Overview,
   type Order,
   type OrderFilterParams,
   type OrderTransitionMutation,
@@ -256,6 +258,10 @@ export class ApiClient {
       },
       z.object({ success: z.boolean() })
     );
+  }
+  // Insights 2.0
+  async getInsightsOverview(): Promise<Insights2Overview> {
+    return this.request("/insights/overview", { method: "GET" }, Insights2OverviewSchema);
   }
 }
 

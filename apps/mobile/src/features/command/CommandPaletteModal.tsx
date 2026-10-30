@@ -129,15 +129,15 @@ export function CommandPaletteModal(): React.JSX.Element | null {
       .filter(
         (o) =>
           o.id.toLowerCase().includes(q) ||
-          o.customerName.toLowerCase().includes(q) ||
+          o.customer.name.toLowerCase().includes(q) ||
           o.status.toLowerCase().includes(q)
       )
       .slice(0, 8)
       .map((o) => ({
         id: `ord_${o.id}`,
         category: "ORDER",
-        title: `Order #${o.id.slice(0, 8)} - ${o.customerName}`,
-        subtitle: `${o.status.toUpperCase()} · KES ${o.totalAmount.toLocaleString()}`,
+        title: `Order #${o.id.slice(0, 8)} - ${o.customer.name}`,
+        subtitle: `${o.status.toUpperCase()} · KES ${o.total.toLocaleString()}`,
         onSelect: () => {
           close();
           router.push(`/orders/${o.id}`);
@@ -250,7 +250,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 12 },
     shadowOpacity: 0.15,
     shadowRadius: 24,
-    elevation: tokens.elevation.modal,
+    elevation: tokens.elevation.light.modal.elevation,
     overflow: "hidden",
   },
   searchHeader: {

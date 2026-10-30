@@ -278,7 +278,7 @@ export default function ProductsScreen(): React.JSX.Element {
         <View style={{ width: tokens.spacing.xs }} />
         <Button
           title={isSelectMode ? "Done" : "Select"}
-          variant={isSelectMode ? "secondary" : "ghost"}
+          variant={isSelectMode ? "secondary" : "outline"}
           onPress={() => {
             hapticFeedback.selection();
             setIsSelectMode(!isSelectMode);
@@ -300,7 +300,7 @@ export default function ProductsScreen(): React.JSX.Element {
           </Text>
           <Button
             title={selectedIds.length === products.length ? "Deselect All" : "Select All"}
-            variant="ghost"
+            variant="outline"
             size="sm"
             onPress={handleSelectAll}
           />
@@ -353,21 +353,18 @@ export default function ProductsScreen(): React.JSX.Element {
           actionTitle={t("common.retry")}
           onAction={() => refetch()}
         />
+      ) : products.length === 0 ? (
+        <EmptyState
+          title={t("products.empty")}
+          actionTitle="+ Add Product"
+          onAction={() => router.push("/products/create")}
+        />
       ) : (
         <FlashList
           data={products}
           renderItem={renderItem}
           keyExtractor={keyExtractor}
-          estimatedItemSize={92}
           contentContainerStyle={styles.listContent}
-          ListEmptyComponent={
-            <EmptyState
-              title={t("products.noProducts")}
-              description={t("products.noProductsDescription")}
-              actionTitle="+ Add Product"
-              onAction={() => router.push("/products/create")}
-            />
-          }
         />
       )}
 
@@ -538,7 +535,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.15,
     shadowRadius: 16,
-    elevation: tokens.elevation.card,
+    elevation: tokens.elevation.light.card.elevation,
   },
   modalOverlay: {
     flex: 1,

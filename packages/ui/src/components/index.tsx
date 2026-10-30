@@ -121,7 +121,19 @@ export function Card({ children, style, variant = "standard", ...props }: CardPr
 // ─── BADGE ──────────────────────────────────────────────────────────────
 export interface BadgeProps {
   label: string;
-  variant?: "new" | "accepted" | "packed" | "shipped" | "delivered" | "cancelled" | "default";
+  variant?:
+    | "new"
+    | "accepted"
+    | "packed"
+    | "shipped"
+    | "delivered"
+    | "cancelled"
+    | "critical"
+    | "warning"
+    | "success"
+    | "info"
+    | "default";
+  size?: "sm" | "md";
 }
 
 export function Badge({ label, variant = "default" }: BadgeProps): React.JSX.Element {
@@ -131,11 +143,13 @@ export function Badge({ label, variant = "default" }: BadgeProps): React.JSX.Ele
 
   switch (variant) {
     case "new":
+    case "info":
       bg = tokens.colors.light.badgeNewBg;
       text = tokens.colors.light.badgeNewText;
       dotColor = tokens.colors.light.accent;
       break;
     case "accepted":
+    case "warning":
       bg = tokens.colors.light.badgeAcceptedBg;
       text = tokens.colors.light.badgeAcceptedText;
       dotColor = tokens.colors.light.gold;
@@ -151,11 +165,13 @@ export function Badge({ label, variant = "default" }: BadgeProps): React.JSX.Ele
       dotColor = tokens.colors.light.textPrimary;
       break;
     case "delivered":
+    case "success":
       bg = tokens.colors.light.badgeDeliveredBg;
       text = tokens.colors.light.badgeDeliveredText;
       dotColor = tokens.colors.light.positive;
       break;
     case "cancelled":
+    case "critical":
       bg = tokens.colors.light.badgeCancelledBg;
       text = tokens.colors.light.badgeCancelledText;
       dotColor = tokens.colors.light.critical;
@@ -333,3 +349,5 @@ const styles = StyleSheet.create({
     minWidth: 160,
   },
 });
+
+export * from "./SparklineChart";

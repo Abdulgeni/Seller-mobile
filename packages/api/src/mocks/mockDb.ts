@@ -340,5 +340,59 @@ export function handleMockRoute(
     return { status: 200, body: { success: true } };
   }
 
+  // 14. Insights 2.0 Pre-aggregated Overview
+  if (pathname === "/insights/overview" && method === "GET") {
+    return {
+      status: 200,
+      body: {
+        depletionForecasts: [
+          {
+            productId: "prod_1",
+            title: "Maasai Beaded Leather Sandals",
+            category: "Footwear",
+            currentStock: 6,
+            dailyVelocity: 2.1,
+            daysUntilStockout: 3,
+            urgency: "critical",
+          },
+          {
+            productId: "prod_2",
+            title: "Hand-Woven Sisal Kiondo Bag",
+            category: "Accessories",
+            currentStock: 14,
+            dailyVelocity: 1.8,
+            daysUntilStockout: 8,
+            urgency: "warning",
+          },
+          {
+            productId: "prod_3",
+            title: "Pure Raw Acacia Honey 500g",
+            category: "General",
+            currentStock: 45,
+            dailyVelocity: 1.2,
+            daysUntilStockout: 38,
+            urgency: "healthy",
+          },
+        ],
+        revenueMargin: {
+          grossRevenue: 428500,
+          estimatedFees: 6428,
+          netPayout: 422072,
+          currency: "KES",
+          marginPercent: 98.5,
+        },
+        sparklineData: [
+          { date: "2026-10-22", label: "Wed", value: 38000 },
+          { date: "2026-10-23", label: "Thu", value: 54000 },
+          { date: "2026-10-24", label: "Fri", value: 72000 },
+          { date: "2026-10-25", label: "Sat", value: 91000 },
+          { date: "2026-10-26", label: "Sun", value: 43000 },
+          { date: "2026-10-27", label: "Mon", value: 65000 },
+          { date: "2026-10-28", label: "Tue", value: 65500 },
+        ],
+      },
+    };
+  }
+
   return { status: 404, body: { message: `Not Found: ${endpoint}` } };
 }

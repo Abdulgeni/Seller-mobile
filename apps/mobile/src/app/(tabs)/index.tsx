@@ -3,13 +3,28 @@ import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { defaultApiClient, queryKeys } from "@repo/api";
-import { Button, Card, EmptyState, NumericRoll, Skeleton, t, tokens } from "@repo/ui";
+import {
+  Badge,
+  Button,
+  Card,
+  EmptyState,
+  NumericRoll,
+  Skeleton,
+  SparklineChart,
+  t,
+  tokens,
+} from "@repo/ui";
 import { useCommandPaletteStore } from "../../features/command/commandStore";
 
 export default function DashboardScreen(): React.JSX.Element {
   const { data: kpis, isLoading, isError, error, refetch } = useQuery({
     queryKey: queryKeys.dashboard.kpis(),
     queryFn: () => defaultApiClient.getDashboardKpis(),
+  });
+
+  const { data: insights } = useQuery({
+    queryKey: queryKeys.insights.overview(),
+    queryFn: () => defaultApiClient.getInsightsOverview(),
   });
 
   if (isLoading) {
@@ -121,6 +136,74 @@ export default function DashboardScreen(): React.JSX.Element {
         </View>
       </Card>
 
+      {/* Insights 2.0: Inventory Depletion Forecast */}
+      {insights && (
+        <Card style={styles.insightsCard}>
+          <View style={styles.insightsHeader}>
+            <Text style={styles.insightsTitle}>✦ Stock Runout Forecast</Text>
+            <Text style={styles.insightsSubtitle}>
+              Predictive burn-rate analysis based on order velocity
+            </Text>
+          </View>
+
+          <View style={styles.forecastList}>
+            {insights.depletionForecasts.map((f) => (
+              <View key={f.productId} style={styles.forecastRow}>
+                <View style={styles.forecastMeta}>
+                  <Text style={styles.forecastTitle} numberOfLines={1}>
+                    {f.title}
+                  </Text>
+                  <Text style={styles.forecastSub}>
+                    Stock: {f.currentStock} · Velocity: ~{f.dailyVelocity}/day
+                  </Text>
+                </View>
+                <Badge
+                  label={
+                    f.urgency === "critical"
+                      ? `~${f.daysUntilStockout}d RUNOUT`
+                      : f.urgency === "warning"
+                        ? `~${f.daysUntilStockout}d stock`
+                        : "HEALTHY"
+                  }
+                  variant={
+                    f.urgency === "critical"
+                      ? "critical"
+                      : f.urgency === "warning"
+                        ? "warning"
+                        : "success"
+                  }
+                  size="sm"
+                />
+              </View>
+            ))}
+          </View>
+        </Card>
+      )}
+
+      {/* Insights 2.0: Revenue Margin & Sparkline */}
+      {insights && (
+        <Card style={styles.marginCard}>
+          <View style={styles.marginHeader}>
+            <View>
+              <Text style={styles.marginTitle}>Net Settlement Margin</Text>
+              <Text style={styles.marginValue}>
+                {insights.revenueMargin.marginPercent}%
+              </Text>
+            </View>
+            <View style={styles.marginStats}>
+              <Text style={styles.marginDetail}>
+                Gross: KES {insights.revenueMargin.grossRevenue.toLocaleString()}
+              </Text>
+              <Text style={styles.marginFee}>
+                M-Pesa Fees: -KES {insights.revenueMargin.estimatedFees.toLocaleString()}
+              </Text>
+            </View>
+          </View>
+          <View style={{ height: tokens.spacing.sm }} />
+          <SparklineChart data={insights.sparklineData} height={64} />
+        </Card>
+      )}
+
       {/* Quick Ops Navigation */}
       <View style={styles.actionsRow}>
         <Button
@@ -136,7 +219,7 @@ export default function DashboardScreen(): React.JSX.Element {
         <View style={{ width: tokens.spacing.sm }} />
         <Button
           title="⌘K"
-          variant="ghost"
+          variant="outline"
           onPress={() => useCommandPaletteStore.getState().open()}
         />
       </View>
@@ -217,5 +300,80 @@ const styles = StyleSheet.create({
   actionsRow: {
     flexDirection: "row",
     marginTop: tokens.spacing.md,
+  },
+  insightsCard: {
+    padding: tokens.spacing.md,
+  },
+  insightsHeader: {
+    marginBottom: tokens.spacing.sm,
+  },
+  insightsTitle: {
+    fontSize: 15,
+    fontWeight: "700",
+    color: tokens.colors.light.contentPrimary,
+    letterSpacing: 0.3,
+  },
+  insightsSubtitle: {
+    fontSize: 12,
+    color: tokens.colors.light.contentSecondary,
+    marginTop: 2,
+  },
+  forecastList: {
+    gap: tokens.spacing.xs,
+  },
+  forecastRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingVertical: tokens.spacing.xs,
+    borderBottomWidth: 1,
+    borderBottomColor: tokens.colors.light.borderSubtle,
+  },
+  forecastMeta: {
+    flex: 1,
+    marginRight: tokens.spacing.sm,
+  },
+  forecastTitle: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: tokens.colors.light.contentPrimary,
+  },
+  forecastSub: {
+    fontSize: 11,
+    color: tokens.colors.light.contentSecondary,
+    marginTop: 1,
+  },
+  marginCard: {
+    padding: tokens.spacing.md,
+  },
+  marginHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+  },
+  marginTitle: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: tokens.colors.light.contentSecondary,
+  },
+  marginValue: {
+    fontSize: 24,
+    fontWeight: "700",
+    color: tokens.colors.light.accent,
+    fontVariant: ["tabular-nums"],
+    marginTop: 2,
+  },
+  marginStats: {
+    alignItems: "flex-end",
+  },
+  marginDetail: {
+    fontSize: 11,
+    color: tokens.colors.light.contentPrimary,
+    fontWeight: "500",
+  },
+  marginFee: {
+    fontSize: 11,
+    color: tokens.colors.light.contentSecondary,
+    marginTop: 2,
   },
 });
