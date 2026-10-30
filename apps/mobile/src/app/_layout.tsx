@@ -5,6 +5,7 @@ import { StatusBar } from "expo-status-bar";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { LaunchRevealGate, tokens } from "@repo/ui";
 import { hydrateAuthSession, useAuthStore } from "../features/auth/authCoordinator";
+import { CommandPaletteModal } from "../features/command/CommandPaletteModal";
 import { ForegroundNotificationBanner } from "../features/notifications/ForegroundNotificationBanner";
 import { initializeNotifications } from "../features/notifications/notificationManager";
 import { NotificationHarnessModal } from "../features/notifications/NotificationHarnessModal";
@@ -54,6 +55,7 @@ export default function RootLayout(): React.JSX.Element {
               <Stack.Screen name="payouts/index" options={{ title: "Financial Payouts" }} />
             </Stack>
             <NotificationHarnessModal />
+            <CommandPaletteModal />
           </LaunchRevealGate>
         </SafeAreaView>
       </QueryClientProvider>

@@ -4,6 +4,7 @@ import { router } from "expo-router";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { defaultApiClient, queryKeys } from "@repo/api";
 import { Button, Card, EmptyState, NumericRoll, Skeleton, t, tokens } from "@repo/ui";
+import { useCommandPaletteStore } from "../../features/command/commandStore";
 
 export default function DashboardScreen(): React.JSX.Element {
   const { data: kpis, isLoading, isError, error, refetch } = useQuery({
@@ -126,11 +127,17 @@ export default function DashboardScreen(): React.JSX.Element {
           title="+ Add Product"
           onPress={() => router.push("/products/create")}
         />
-        <View style={{ width: tokens.spacing.md }} />
+        <View style={{ width: tokens.spacing.sm }} />
         <Button
           title="Payouts"
           variant="secondary"
           onPress={() => router.push("/payouts")}
+        />
+        <View style={{ width: tokens.spacing.sm }} />
+        <Button
+          title="⌘K"
+          variant="ghost"
+          onPress={() => useCommandPaletteStore.getState().open()}
         />
       </View>
     </ScrollView>
