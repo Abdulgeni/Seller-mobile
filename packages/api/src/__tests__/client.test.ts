@@ -3,7 +3,7 @@ import { ApiClient } from "../client";
 import { resetMockDb } from "../mocks/handlers";
 import { server } from "../mocks/server";
 
-const client = new ApiClient({ baseUrl: "https://mock-api.seller.internal" });
+const client = new ApiClient({ baseUrl: "https://mock-api.seller.internal", mockNetwork: false });
 
 beforeAll(() => server.listen({ onUnhandledRequest: "error" }));
 afterEach(() => {

@@ -1,13 +1,10 @@
-import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
-import { resetMockDb, server } from "@repo/api";
+import { afterEach, describe, expect, it } from "vitest";
+import { resetMockDb } from "@repo/api";
 import { defaultPaymentService, PaymentService } from "../paymentService";
 
-beforeAll(() => server.listen({ onUnhandledRequest: "bypass" }));
 afterEach(() => {
-  server.resetHandlers();
   resetMockDb();
 });
-afterAll(() => server.close());
 
 describe("F4 Mocked Mobile-Money Payment Flow", () => {
   it("prevents double-charging on simultaneous double-taps", async () => {

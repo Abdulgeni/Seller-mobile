@@ -26,6 +26,7 @@ import {
 } from "@repo/schemas";
 import { logger } from "@repo/ui";
 import { z } from "zod";
+import { handleMockRoute, simulateMockLatency } from "./mocks/mockDb";
 
 export interface ApiClientConfig {
   baseUrl?: string;
@@ -49,10 +50,16 @@ export class ApiError extends Error {
 export class ApiClient {
   private baseUrl: string;
   private timeoutMs: number;
+  private mockNetwork: boolean;
 
   constructor(config: ApiClientConfig = {}) {
     this.baseUrl = config.baseUrl ?? "https://mock-api.seller.internal";
     this.timeoutMs = config.timeoutMs ?? 10000;
+    this.mockNetwork =
+      config.mockNetwork ??
+      (typeof process !== "undefined"
+        ? process.env["EXPO_PUBLIC_MOCK_NETWORK"] !== "false"
+        : true);
   }
 
   private async request<T>(
@@ -60,6 +67,26 @@ export class ApiClient {
     options: RequestInit = {},
     schema?: z.ZodType<T, z.ZodTypeDef, unknown>
   ): Promise<T> {
+    if (this.mockNetwork) {
+      await simulateMockLatency();
+      const res = handleMockRoute(endpoint, options);
+      if (res.status >= 400) {
+        const errorBody = (res.body ?? {}) as Record<string, unknown>;
+        const message = typeof errorBody["message"] === "string" ? errorBody["message"] : "Mock request failed";
+        const code = typeof errorBody["code"] === "string" ? errorBody["code"] : undefined;
+        throw new ApiError(res.status, message, code, errorBody);
+      }
+      if (schema) {
+        const parseResult = schema.safeParse(res.body);
+        if (!parseResult.success) {
+          logger.error("API response validation failed", parseResult.error, { endpoint });
+          throw new ApiError(500, "Response schema mismatch", "SCHEMA_VALIDATION_ERROR", parseResult.error.format());
+        }
+        return parseResult.data;
+      }
+      return res.body as T;
+    }
+
     const url = `${this.baseUrl}${endpoint}`;
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), this.timeoutMs);

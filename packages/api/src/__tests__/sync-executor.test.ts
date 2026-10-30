@@ -5,7 +5,7 @@ import { server } from "../mocks/server";
 import { createSyncExecutor } from "../sync/executor";
 import { SyncQueueManager, type SyncStorageAdapter } from "../sync";
 
-const client = new ApiClient({ baseUrl: "https://mock-api.seller.internal" });
+const client = new ApiClient({ baseUrl: "https://mock-api.seller.internal", mockNetwork: false });
 
 beforeAll(() => server.listen({ onUnhandledRequest: "error" }));
 afterEach(() => {
