@@ -114,17 +114,30 @@ export class PaymentService {
   }
 
   formatReceiptText(tx: PaymentTransaction): string {
+    const channelName =
+      tx.provider === "CBE"
+        ? "CBE Birr / Commercial Bank of Ethiopia"
+        : tx.provider === "MPESA"
+          ? "Safaricom M-Pesa Ethiopia"
+          : "Telebirr (Ethio Telecom)";
+
     return [
-      "========== PAYMENT RECEIPT ==========",
-      `Receipt No: ${tx.receiptNumber ?? tx.checkoutRequestId}`,
-      `Order ID: ${tx.orderId}`,
-      `Date: ${new Date(tx.completedAt ?? tx.initiatedAt).toLocaleString()}`,
-      `Customer Phone: ${tx.customerPhone}`,
-      `Amount Paid: ${tx.currency} ${tx.amount.toLocaleString()}`,
-      `Status: ${tx.state}`,
-      `Reference: ${tx.providerReference ?? "N/A"}`,
-      "=====================================",
-      "Thank you for your business!",
+      "================================================",
+      "          ATELIER HABESHA · ADDIS ABABA",
+      "           OFFICIAL TRANSACTION RECEIPT",
+      "================================================",
+      `Receipt No:       ${tx.receiptNumber ?? tx.checkoutRequestId}`,
+      `Order ID:         ${tx.orderId}`,
+      `Channel:          ${channelName}`,
+      `Date & Time:      ${new Date(tx.completedAt ?? tx.initiatedAt).toLocaleString()}`,
+      `Customer Account: ${tx.customerPhone}`,
+      `Amount Settled:   ${tx.currency} ${tx.amount.toLocaleString()}`,
+      `Payment Status:   ${tx.state} (CONFIRMED)`,
+      `Provider Ref:     ${tx.providerReference ?? tx.checkoutRequestId}`,
+      "------------------------------------------------",
+      "Settled via National Payment Switch · Addis Ababa",
+      "Thank you for supporting authentic Ethiopian artisans!",
+      "================================================",
     ].join("\n");
   }
 }

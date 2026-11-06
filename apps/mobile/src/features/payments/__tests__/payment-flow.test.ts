@@ -6,7 +6,7 @@ afterEach(() => {
   resetMockDb();
 });
 
-describe("F4 Mocked Mobile-Money Payment Flow", () => {
+describe("F4 Mocked Mobile-Money Payment Flow (Telebirr, CBE Birr, M-Pesa)", () => {
   it("prevents double-charging on simultaneous double-taps", async () => {
     const service = new PaymentService();
     const idempotencyKey = "22222222-2222-4222-8222-222222222222";
@@ -15,8 +15,9 @@ describe("F4 Mocked Mobile-Money Payment Flow", () => {
       orderId: "ord_1",
       vendorId: "vdr_primary_store",
       amount: 3500,
-      currency: "KES" as const,
-      customerPhone: "+254712345678",
+      currency: "ETB" as const,
+      customerPhone: "+251911234567",
+      provider: "TELEBIRR" as const,
       idempotencyKey,
     };
 
@@ -38,8 +39,9 @@ describe("F4 Mocked Mobile-Money Payment Flow", () => {
       orderId: "ord_2",
       vendorId: "vdr_primary_store",
       amount: 4500,
-      currency: "KES" as const,
-      customerPhone: "+254722123456",
+      currency: "ETB" as const,
+      customerPhone: "+251922123456",
+      provider: "CBE" as const,
       idempotencyKey: "33333333-3333-4333-8333-333333333333",
     };
 
@@ -54,16 +56,17 @@ describe("F4 Mocked Mobile-Money Payment Flow", () => {
     expect(recovered?.receiptNumber).toBeDefined();
   });
 
-  it("formats comprehensive shareable payment receipt", () => {
+  it("formats comprehensive shareable payment receipt with Ethiopian provider details", () => {
     const tx = {
       id: "tx_receipt_1",
       orderId: "ord_555",
       vendorId: "vdr_primary_store",
       amount: 1500,
-      currency: "KES" as const,
-      customerPhone: "+254712345678",
+      currency: "ETB" as const,
+      customerPhone: "+251911234567",
+      provider: "TELEBIRR" as const,
       state: "SUCCESS" as const,
-      providerReference: "MPESA_ABC123",
+      providerReference: "TLB-78901234",
       idempotencyKey: "11111111-1111-4111-8111-111111111111",
       checkoutRequestId: "ws_CO_9999",
       initiatedAt: "2026-10-28T10:00:00.000Z",
@@ -72,10 +75,11 @@ describe("F4 Mocked Mobile-Money Payment Flow", () => {
     };
 
     const receipt = defaultPaymentService.formatReceiptText(tx);
-    expect(receipt).toContain("PAYMENT RECEIPT");
+    expect(receipt).toContain("TRANSACTION RECEIPT");
     expect(receipt).toContain("REC-9999");
-    expect(receipt).toContain("KES 1,500");
-    expect(receipt).toContain("+254712345678");
-    expect(receipt).toContain("MPESA_ABC123");
+    expect(receipt).toContain("ETB 1,500");
+    expect(receipt).toContain("+251911234567");
+    expect(receipt).toContain("TLB-78901234");
+    expect(receipt).toContain("Telebirr (Ethio Telecom)");
   });
 });

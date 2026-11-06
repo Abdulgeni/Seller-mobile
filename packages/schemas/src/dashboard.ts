@@ -16,7 +16,7 @@ export const DashboardKpiMetricsSchema = VendorScopeSchema.extend({
   ordersPendingAcceptanceCount: z.number().int().nonnegative(),
   lowStockItemsCount: z.number().int().nonnegative(),
   pendingPayoutAmount: z.number().nonnegative(),
-  currency: CurrencyCodeSchema.default("KES"),
+  currency: CurrencyCodeSchema.default("ETB"),
   revenue7DaysSeries: z.array(RevenueDataPointSchema),
   lastAggregatedAt: IsoDateTimeSchema,
 });

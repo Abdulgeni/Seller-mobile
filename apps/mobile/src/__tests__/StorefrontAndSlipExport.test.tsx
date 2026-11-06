@@ -32,7 +32,7 @@ const sampleOrder: Order = {
   subtotal: 9000,
   shippingFee: 0,
   discountTotal: 0,
-  currency: "KES",
+  currency: "ETB",
   status: "ACCEPTED",
   createdAt: "2026-10-28T09:00:00.000Z",
   updatedAt: "2026-10-28T09:05:00.000Z",

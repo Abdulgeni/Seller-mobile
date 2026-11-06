@@ -37,7 +37,7 @@ const baseOrder: Order = {
   shippingFee: 100,
   discountTotal: 0,
   total: 1100,
-  currency: "KES",
+  currency: "ETB",
   createdAt: "2026-10-28T04:00:00.000Z",
   updatedAt: "2026-10-28T04:00:00.000Z",
   timeline: [],

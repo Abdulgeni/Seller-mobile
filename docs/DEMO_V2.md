@@ -58,13 +58,15 @@
   2. Tap `Transition to ACCEPTED`.
   3. Observe the status badge rotate on the X-axis with spring dampening and a tactile detent.
 
-### 6. Payment Vault & Rising Gold Receipt
-- **What it is**: Completing an M-Pesa collection or payout presents `<PaymentVaultReceiptRise>` — a luxury sliding receipt sheet featuring an animated checkmark, Sovereign Gold seal, and transaction breakdown ready for printable export.
+### 6. Official Transaction Receipt & Confirmation
+- **What it is**: Settling an order via Ethiopian payment channels (**Telebirr**, **CBE Birr / CBE Banking**, or **M-Pesa Ethiopia**) presents `<PaymentReceiptConfirmation>` — an elevated sliding official transaction receipt sheet featuring an animated checkmark, Sovereign Gold seal, and transaction breakdown ready for export and sharing.
 - **How to verify**:
-  1. Open an order detail screen.
-  2. Tap `Collect Payment (KES 9,000)`.
-  3. Select M-Pesa STK push.
-  4. Upon simulation completion, watch the receipt card rise with a tactile haptic pulse and verify the gold seal.
+  1. Open an order detail screen (`orders/[id]`).
+  2. Tap `Collect Payment (ETB ...)`.
+  3. Select your provider of choice: **Telebirr** (Ethio Telecom), **CBE Birr** (Commercial Bank of Ethiopia), or **M-Pesa** (Safaricom Ethiopia).
+  4. Enter or confirm the customer phone number (e.g. `0911234567` or `+251911234567`).
+  5. Tap `Authorize via ...`.
+  6. Upon settlement confirmation, watch the official receipt card rise with a tactile haptic pulse, authentic transaction reference (`TLB-8901234`, `CBE-FT901234`, etc.), and tap `Export Official Receipt` to share.
 
 ---
 
@@ -85,7 +87,7 @@
 - **Trigger**: Visible directly on the **Dashboard** screen.
 - **Capability**: Pre-aggregated server insights displaying:
   - Predictive burn-rate runout forecasts ("Depletes in ~3d RUNOUT", "HEALTHY").
-  - Net settlement margin card displaying gross revenue vs M-Pesa transaction fees.
+  - Net settlement margin card displaying gross revenue vs payment processing fees (Telebirr / CBE / M-Pesa).
   - Skia/SVG micro sparkline chart visualizing real-time daily revenue momentum.
 
 ### F4: Customer Messages & Inquiry Threads

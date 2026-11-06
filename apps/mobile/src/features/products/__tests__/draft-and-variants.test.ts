@@ -14,7 +14,7 @@ describe("Product Draft Persistence (survives app kill)", () => {
       description: "Full grain genuine leather bag",
       category: "Accessories",
       price: 4500,
-      currency: "KES",
+      currency: "ETB",
       stockCount: 15,
       images: [
         {

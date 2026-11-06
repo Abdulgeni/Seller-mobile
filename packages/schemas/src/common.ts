@@ -6,7 +6,7 @@ export const VendorScopeSchema = z.object({
 
 export const UuidSchema = z.string().uuid();
 
-export const CurrencyCodeSchema = z.enum(["KES", "USD", "EUR", "GBP"]);
+export const CurrencyCodeSchema = z.enum(["ETB", "KES", "USD", "EUR", "GBP"]);
 
 export const IsoDateTimeSchema = z.string().datetime();
 

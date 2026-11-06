@@ -65,13 +65,13 @@ export function SettingsModal(): React.JSX.Element | null {
             </View>
             <View style={styles.profileMeta}>
               <View style={styles.tierRow}>
-                <Text style={styles.storeName}>Atelier Artisans Nairobi</Text>
+                <Text style={styles.storeName}>Atelier Habesha Addis Ababa</Text>
                 <Badge label="SOVEREIGN TIER" variant="warning" size="sm" />
               </View>
               <Text style={styles.storeSub}>
-                Single-Vendor Storefront · Multi-Vendor Seam Enabled
+                Artisan Ethiopian Storefront · Multi-Vendor Seam Enabled
               </Text>
-              <Text style={styles.storeLocation}>📍 Kilimani, Nairobi, Kenya</Text>
+              <Text style={styles.storeLocation}>📍 Bole Atlas, Addis Ababa, Ethiopia</Text>
             </View>
           </Card>
 

@@ -50,7 +50,7 @@ export default function OpsScreen(): React.JSX.Element {
   const handleSimulateIncomingOrder = () => {
     Alert.alert(
       "🔔 Push Notification: New Order!",
-      "Order #ORD-2026031 received for KES 4,500.",
+      "Order #ORD-2026031 received for ETB 4,500.",
       [
         { text: "Dismiss", style: "cancel" },
         { text: "View Order", onPress: () => router.push("/orders/ord_1") },

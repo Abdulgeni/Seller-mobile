@@ -45,7 +45,7 @@ export const OrderSchema = VendorScopeSchema.extend({
   customer: CustomerInfoSchema,
   status: OrderStatusSchema,
   items: z.array(OrderLineItemSchema).min(1),
-  currency: CurrencyCodeSchema.default("KES"),
+  currency: CurrencyCodeSchema.default("ETB"),
   subtotal: z.number().positive(),
   shippingFee: z.number().nonnegative().default(0),
   discountTotal: z.number().nonnegative().default(0),

@@ -194,10 +194,10 @@ export default function DashboardScreen(): React.JSX.Element {
             </View>
             <View style={styles.marginStats}>
               <Text style={styles.marginDetail}>
-                Gross: KES {insights.revenueMargin.grossRevenue.toLocaleString()}
+                Gross: {insights.revenueMargin.currency} {insights.revenueMargin.grossRevenue.toLocaleString()}
               </Text>
               <Text style={styles.marginFee}>
-                M-Pesa Fees: -KES {insights.revenueMargin.estimatedFees.toLocaleString()}
+                Payment Gateway Fees: -{insights.revenueMargin.currency} {insights.revenueMargin.estimatedFees.toLocaleString()}
               </Text>
             </View>
           </View>

@@ -34,7 +34,7 @@ export const mockDb: MockDbState = {
         id: "msg_1",
         orderId: "ord_1",
         sender: "customer",
-        text: "Jambo! Could you please let me know if this order can be dispatched today?",
+        text: "Selam! Could you please let me know if this Menen Kemis can be dispatched to Bole today?",
         timestamp: "2026-10-28T09:30:00.000Z",
         status: "delivered",
       },
@@ -54,7 +54,7 @@ export function resetMockDb(): void {
         id: "msg_1",
         orderId: "ord_1",
         sender: "customer",
-        text: "Jambo! Could you please let me know if this order can be dispatched today?",
+        text: "Selam! Could you please let me know if this Menen Kemis can be dispatched to Bole today?",
         timestamp: "2026-10-28T09:30:00.000Z",
         status: "delivered",
       },
@@ -301,7 +301,7 @@ export function handleMockRoute(
     return { status: 200, body: order };
   }
 
-  // 11. Payments STK Push
+  // 11. Payments STK Push & Mobile Money (Telebirr, CBE Birr, M-Pesa)
   if (pathname === "/payments/stk-push" && method === "POST") {
     const req = JSON.parse((options.body as string) || "{}") as PaymentInitiationRequest;
 
@@ -319,18 +319,22 @@ export function handleMockRoute(
       failureReason = "TIMEOUT";
     }
 
+    const provider = req.provider ?? "TELEBIRR";
+    const refPrefix = provider === "CBE" ? "CBE" : provider === "MPESA" ? "MP-ETH" : "TLB";
+
     const transaction: PaymentTransaction = {
       id: `tx_${Date.now()}`,
       orderId: req.orderId,
       vendorId: req.vendorId,
       amount: req.amount,
-      currency: "KES",
+      currency: "ETB",
       customerPhone: req.customerPhone,
+      provider,
       state: simulatedState,
       ...(failureReason ? { failureReason } : {}),
       providerReference: undefined,
       idempotencyKey: req.idempotencyKey,
-      checkoutRequestId: `ws_CO_${Date.now()}`,
+      checkoutRequestId: `${refPrefix}_REQ_${Date.now()}`,
       initiatedAt: new Date().toISOString(),
       ...(simulatedState !== "PENDING" ? { completedAt: new Date().toISOString() } : {}),
     };
@@ -354,8 +358,11 @@ export function handleMockRoute(
 
     if (tx.state === "PENDING") {
       tx.state = "SUCCESS";
-      tx.providerReference = `MPESA_${Date.now()}`;
-      tx.receiptNumber = `REC-${Date.now()}`;
+      const p = tx.provider ?? "TELEBIRR";
+      const suffix = Date.now().toString().slice(-8);
+      const ref = p === "CBE" ? `CBE-FT${suffix}` : p === "MPESA" ? `MP-ETH-${suffix}` : `TLB-${suffix}`;
+      tx.providerReference = ref;
+      tx.receiptNumber = ref;
       tx.completedAt = new Date().toISOString();
     }
     return { status: 200, body: tx };
@@ -374,47 +381,47 @@ export function handleMockRoute(
         depletionForecasts: [
           {
             productId: "prod_1",
-            title: "Maasai Beaded Leather Sandals",
-            category: "Footwear",
-            currentStock: 6,
-            dailyVelocity: 2.1,
-            daysUntilStockout: 3,
+            title: "Handwoven Menen Habesha Kemis (Gold Tibeb)",
+            category: "Apparel",
+            currentStock: 4,
+            dailyVelocity: 1.8,
+            daysUntilStockout: 2,
             urgency: "critical",
           },
           {
-            productId: "prod_2",
-            title: "Hand-Woven Sisal Kiondo Bag",
+            productId: "prod_6",
+            title: "Highland Calfskin Executive Duffle Bag",
             category: "Accessories",
-            currentStock: 14,
-            dailyVelocity: 1.8,
-            daysUntilStockout: 8,
+            currentStock: 8,
+            dailyVelocity: 1.1,
+            daysUntilStockout: 7,
             urgency: "warning",
           },
           {
-            productId: "prod_3",
-            title: "Pure Raw Acacia Honey 500g",
-            category: "General",
-            currentStock: 45,
-            dailyVelocity: 1.2,
-            daysUntilStockout: 38,
+            productId: "prod_11",
+            title: "Yirgacheffe Grade 1 Special Reserve",
+            category: "Specialty Coffee",
+            currentStock: 28,
+            dailyVelocity: 3.4,
+            daysUntilStockout: 8,
             urgency: "healthy",
           },
         ],
         revenueMargin: {
-          grossRevenue: 428500,
-          estimatedFees: 6428,
-          netPayout: 422072,
-          currency: "KES",
+          grossRevenue: 845000,
+          estimatedFees: 12675,
+          netPayout: 832325,
+          currency: "ETB",
           marginPercent: 98.5,
         },
         sparklineData: [
-          { date: "2026-10-22", label: "Wed", value: 38000 },
-          { date: "2026-10-23", label: "Thu", value: 54000 },
-          { date: "2026-10-24", label: "Fri", value: 72000 },
-          { date: "2026-10-25", label: "Sat", value: 91000 },
-          { date: "2026-10-26", label: "Sun", value: 43000 },
-          { date: "2026-10-27", label: "Mon", value: 65000 },
-          { date: "2026-10-28", label: "Tue", value: 65500 },
+          { date: "2026-10-22", label: "Wed", value: 48000 },
+          { date: "2026-10-23", label: "Thu", value: 64000 },
+          { date: "2026-10-24", label: "Fri", value: 82000 },
+          { date: "2026-10-25", label: "Sat", value: 110000 },
+          { date: "2026-10-26", label: "Sun", value: 65000 },
+          { date: "2026-10-27", label: "Mon", value: 85000 },
+          { date: "2026-10-28", label: "Tue", value: 92500 },
         ],
       },
     };

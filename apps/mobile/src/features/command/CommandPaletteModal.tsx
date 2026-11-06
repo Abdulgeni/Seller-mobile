@@ -139,7 +139,7 @@ export function CommandPaletteModal(): React.JSX.Element | null {
         id: `prod_${p.id}`,
         category: "PRODUCT",
         title: p.title,
-        subtitle: `${p.category} · KES ${p.price.toLocaleString()} · ${p.inStock ? "In Stock" : "Out of Stock"}`,
+        subtitle: `${p.category} · ${p.currency ?? "ETB"} ${p.price.toLocaleString()} · ${p.inStock ? "In Stock" : "Out of Stock"}`,
         onSelect: () => {
           close();
           router.push(`/products/${p.id}`);
@@ -158,7 +158,7 @@ export function CommandPaletteModal(): React.JSX.Element | null {
         id: `ord_${o.id}`,
         category: "ORDER",
         title: `Order #${o.id.slice(0, 8)} - ${o.customer.name}`,
-        subtitle: `${o.status.toUpperCase()} · KES ${o.total.toLocaleString()}`,
+        subtitle: `${o.status.toUpperCase()} · ${o.currency ?? "ETB"} ${o.total.toLocaleString()}`,
         onSelect: () => {
           close();
           router.push(`/orders/${o.id}`);

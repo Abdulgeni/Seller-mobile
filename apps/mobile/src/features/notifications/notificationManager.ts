@@ -189,7 +189,7 @@ export async function simulateIncomingNewOrder(order: {
   const payload = {
     id: `notif_${Date.now()}`,
     title: `New Order #${order.orderNumber}`,
-    body: `${order.customerName} placed an order for KES ${order.total.toLocaleString()}`,
+    body: `${order.customerName} placed an order for ETB ${order.total.toLocaleString()}`,
     category: "NEW_ORDER" as const,
     data: {
       orderId: order.id,

@@ -45,8 +45,9 @@ const CATEGORIES: ProductCategory[] = [
   "Apparel",
   "Footwear",
   "Accessories",
-  "Electronics",
+  "Specialty Coffee",
   "Home & Living",
+  "Jewelry",
   "Beauty & Personal Care",
   "General",
 ];
@@ -75,7 +76,7 @@ export default function CreateProductScreen(): React.JSX.Element {
       title: "",
       description: "",
       category: "Apparel",
-      price: 1500,
+      price: 3500,
       stockCount: 10,
     },
   });
@@ -116,7 +117,7 @@ export default function CreateProductScreen(): React.JSX.Element {
         description: formValues?.description ?? "",
         category: draftCategory,
         price: Number(formValues?.price) || 0,
-        currency: "KES",
+        currency: "ETB",
         stockCount: Number(formValues?.stockCount) || 0,
         images: photos,
         variants,
@@ -296,8 +297,8 @@ export default function CreateProductScreen(): React.JSX.Element {
       const finalPhotos = photos.length > 0 ? photos : [
         {
           id: `img_${now}`,
-          uri: "https://picsum.photos/seed/default/800/800",
-          thumbnailUri: "https://picsum.photos/seed/default/200/200",
+          uri: "https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=800&q=80",
+          thumbnailUri: "https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=200&q=80",
           isCover: true,
           order: 0,
           fileSizeBytes: 140 * 1024,
@@ -312,7 +313,7 @@ export default function CreateProductScreen(): React.JSX.Element {
         description: data.description,
         category: data.category,
         price: data.price,
-        currency: "KES",
+        currency: "ETB",
         stockCount: data.stockCount,
         images: finalPhotos,
         variants,
@@ -479,7 +480,7 @@ export default function CreateProductScreen(): React.JSX.Element {
               name="price"
               render={({ field: { onChange, value } }) => (
                 <Input
-                  label="Price (KES) *"
+                  label="Price (ETB) *"
                   value={String(value || "")}
                   onChangeText={onChange}
                   keyboardType="numeric"

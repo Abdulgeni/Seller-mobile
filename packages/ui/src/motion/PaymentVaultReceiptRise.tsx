@@ -10,6 +10,7 @@ export interface ReceiptTransaction {
   amount: number;
   currency: string;
   state: string;
+  provider?: string | undefined;
   checkoutRequestId?: string | undefined;
   receiptNumber?: string | null | undefined;
   completedAt?: string | null | undefined;
@@ -60,6 +61,13 @@ export function PaymentVaultReceiptRise({
     }
   }, [isReducedMotion, slideAnim, scaleAnim, checkAnim]);
 
+  const providerName =
+    transaction.provider === "CBE"
+      ? "CBE Birr / CBE Banking"
+      : transaction.provider === "MPESA"
+        ? "M-Pesa Ethiopia"
+        : "Telebirr (Ethio Telecom)";
+
   return (
     <Animated.View
       style={[
@@ -69,10 +77,10 @@ export function PaymentVaultReceiptRise({
         },
       ]}
     >
-      {/* Gold Seal Header */}
+      {/* Official Receipt Header */}
       <View style={styles.sealBadge}>
         <Text style={styles.sealIcon}>✦</Text>
-        <Text style={styles.sealText}>ATELIER SETTLEMENT VAULT</Text>
+        <Text style={styles.sealText}>OFFICIAL TRANSACTION RECEIPT</Text>
       </View>
 
       {/* Vector Draw-on Checkmark representation */}
@@ -95,7 +103,7 @@ export function PaymentVaultReceiptRise({
         </View>
         <View style={styles.detailRow}>
           <Text style={styles.detailLabel}>Channel</Text>
-          <Text style={styles.detailValue}>M-Pesa Express (STK)</Text>
+          <Text style={styles.detailValue}>{providerName}</Text>
         </View>
         <View style={styles.detailRow}>
           <Text style={styles.detailLabel}>Timestamp</Text>
@@ -114,11 +122,14 @@ export function PaymentVaultReceiptRise({
       <View style={styles.actionButtons}>
         <Button title="Share Printable Receipt" variant="outline" onPress={onShare} />
         <View style={{ height: tokens.spacing.xs }} />
-        <Button title="Dismiss & Finalize" variant="primary" onPress={onDone} />
+        <Button title="Done" variant="primary" onPress={onDone} />
       </View>
     </Animated.View>
   );
 }
+
+export const PaymentReceiptConfirmation = PaymentVaultReceiptRise;
+export type PaymentReceiptConfirmationProps = PaymentVaultReceiptRiseProps;
 
 const styles = StyleSheet.create({
   receiptContainer: {

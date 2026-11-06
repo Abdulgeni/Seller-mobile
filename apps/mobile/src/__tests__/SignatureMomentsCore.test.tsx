@@ -11,11 +11,11 @@ describe("Loop 2: Signature Moments Core", () => {
 
     const element = React.createElement(NumericRoll, {
       value: 12500,
-      prefix: "KES ",
+      prefix: "ETB ",
       durationMs: 450,
     });
     expect(element.props.value).toBe(12500);
-    expect(element.props.prefix).toBe("KES ");
+    expect(element.props.prefix).toBe("ETB ");
   });
 
   it("verifies LaunchRevealGate wraps children and defines overlay spring", () => {

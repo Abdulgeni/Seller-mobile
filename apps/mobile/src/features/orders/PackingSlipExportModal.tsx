@@ -39,7 +39,7 @@ export function PackingSlipExportModal({
 
       const packingSlipContent = [
         "================================================",
-        "          ATELIER ARTISANS NAIROBI",
+        "          ATELIER HABESHA · ADDIS ABABA",
         "        OFFICIAL DISPATCH PACKING SLIP",
         "================================================",
         `Order Number:   ${order.orderNumber}`,
@@ -57,8 +57,8 @@ export function PackingSlipExportModal({
         `Total Items:    ${order.items.reduce((acc, i) => acc + i.quantity, 0)} units`,
         `Declared Value: ${order.currency} ${order.total.toLocaleString()}`,
         "================================================",
-        "Dispatched via Atelier Secure Fulfillment Nairobi",
-        "Verification Hash: ATL-" + order.id.slice(-8).toUpperCase(),
+        "Dispatched via Atelier Secure Fulfillment Addis Ababa",
+        "Verification Hash: ETH-ATL-" + order.id.slice(-8).toUpperCase(),
         "================================================",
       ].join("\n");
 
@@ -97,9 +97,9 @@ export function PackingSlipExportModal({
             <Card style={styles.slipCard}>
               {/* Slip Header */}
               <View style={styles.slipBranding}>
-                <Text style={styles.atelierWordmark}>✦ ATELIER ARTISANS ✦</Text>
+                <Text style={styles.atelierWordmark}>✦ ATELIER HABESHA ✦</Text>
                 <Text style={styles.slipDocTitle}>DISPATCH & PACKING NOTE</Text>
-                <Text style={styles.slipDocSubtitle}>Nairobi Fulfillment Center</Text>
+                <Text style={styles.slipDocSubtitle}>Addis Ababa Fulfillment Center</Text>
               </View>
 
               <View style={styles.divider} />
@@ -150,7 +150,7 @@ export function PackingSlipExportModal({
                   | | | | ||||| | || |||| | ||||| || | | |||
                 </Text>
                 <Text style={styles.hashText}>
-                  ATL-VERIFIED-{order.id.slice(-8).toUpperCase()}
+                  ETH-ATL-VERIFIED-{order.id.slice(-8).toUpperCase()}
                 </Text>
                 <View style={styles.signatureRow}>
                   <Text style={styles.signatureText}>Fulfillment Sign-off: ✓ INSPECTED</Text>

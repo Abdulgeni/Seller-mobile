@@ -17,12 +17,12 @@ export default function PayoutsScreen(): React.JSX.Element {
 
         <Card>
           <Text style={styles.cardHeading}>Available Balance</Text>
-          <Text style={styles.balanceValue}>KES 89,400.00</Text>
+          <Text style={styles.balanceValue}>ETB 189,400.00</Text>
           <Text style={styles.balanceSubtext}>Next automated settlement on Friday</Text>
 
           <View style={{ marginTop: tokens.spacing.md }}>
             <Button
-              title="Request Instant M-Pesa Payout"
+              title="Request Instant Payout (Telebirr / CBE)"
               onPress={() => {}}
             />
           </View>
@@ -32,11 +32,11 @@ export default function PayoutsScreen(): React.JSX.Element {
           <Text style={styles.cardHeading}>Payout Destination</Text>
           <View style={styles.detailRow}>
             <Text style={styles.detailLabel}>Settlement Channel:</Text>
-            <Text style={styles.detailValue}>M-Pesa Business Till</Text>
+            <Text style={styles.detailValue}>Telebirr SuperApp / CBE Birr</Text>
           </View>
           <View style={styles.detailRow}>
             <Text style={styles.detailLabel}>Phone / Account:</Text>
-            <Text style={styles.detailValue}>+254 712 *** 678</Text>
+            <Text style={styles.detailValue}>+251 911 *** 456</Text>
           </View>
           <View style={styles.detailRow}>
             <Text style={styles.detailLabel}>Platform Split Cut:</Text>
@@ -51,14 +51,14 @@ export default function PayoutsScreen(): React.JSX.Element {
               <Text style={styles.payoutRef}>BATCH-2026-10-24</Text>
               <Text style={styles.payoutDate}>24 Oct 2026, 06:00 AM</Text>
             </View>
-            <Text style={styles.payoutAmount}>KES 135,000.00</Text>
+            <Text style={styles.payoutAmount}>ETB 385,000.00</Text>
           </View>
           <View style={styles.payoutRow}>
             <View>
               <Text style={styles.payoutRef}>BATCH-2026-10-17</Text>
               <Text style={styles.payoutDate}>17 Oct 2026, 06:00 AM</Text>
             </View>
-            <Text style={styles.payoutAmount}>KES 118,500.00</Text>
+            <Text style={styles.payoutAmount}>ETB 318,500.00</Text>
           </View>
         </Card>
       </ScrollView>
@@ -93,6 +93,7 @@ const styles = StyleSheet.create({
     fontWeight: "800",
     color: tokens.colors.light.primary,
     marginTop: tokens.spacing.xs,
+    fontVariant: ["tabular-nums"],
   },
   balanceSubtext: {
     fontSize: 13,
@@ -134,5 +135,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "700",
     color: tokens.colors.light.success,
+    fontVariant: ["tabular-nums"],
   },
 });

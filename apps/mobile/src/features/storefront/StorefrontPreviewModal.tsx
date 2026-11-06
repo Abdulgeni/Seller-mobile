@@ -63,9 +63,9 @@ export function StorefrontPreviewModal({
             <Text style={styles.avatarText}>✦</Text>
           </View>
           <View style={styles.storeMeta}>
-            <Text style={styles.storeName}>Atelier Artisans Nairobi</Text>
+            <Text style={styles.storeName}>Atelier Habesha Addis Ababa</Text>
             <Text style={styles.storeBio}>
-              Authentic handcrafted leather, textiles & East African goods
+              Authentic handcrafted Ethiopian textiles, highland leather & specialty coffee
             </Text>
             <View style={styles.storeBadges}>
               <Badge label="VERIFIED SELLER" variant="success" size="sm" />

@@ -20,7 +20,7 @@ export const RevenueMarginBreakdownSchema = z.object({
   grossRevenue: z.number().nonnegative(),
   estimatedFees: z.number().nonnegative(),
   netPayout: z.number().nonnegative(),
-  currency: z.string().default("KES"),
+  currency: z.string().default("ETB"),
   marginPercent: z.number(),
 });
 export type RevenueMarginBreakdown = z.infer<

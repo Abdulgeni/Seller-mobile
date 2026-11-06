@@ -119,7 +119,7 @@ export default function OrderDetailScreen(): React.JSX.Element {
     },
   });
 
-  const handleSimulateMpesaCollect = () => {
+  const handleCollectPayment = () => {
     setShowPaymentModal(true);
   };
 
@@ -201,9 +201,9 @@ export default function OrderDetailScreen(): React.JSX.Element {
 
         <View style={{ marginTop: tokens.spacing.md }}>
           <Button
-            title={`Collect Payment (${order.currency} ${order.total})`}
+            title={`Collect Payment (${order.currency} ${order.total.toLocaleString()})`}
             variant="outline"
-            onPress={handleSimulateMpesaCollect}
+            onPress={handleCollectPayment}
           />
         </View>
       </Card>

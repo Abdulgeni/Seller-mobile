@@ -43,7 +43,7 @@ const mockOrder: Order = {
   shippingFee: 250,
   discountTotal: 0,
   total: 6000,
-  currency: "KES",
+  currency: "ETB",
   createdAt: "2026-10-28T04:00:00.000Z",
   updatedAt: "2026-10-28T04:00:00.000Z",
   timeline: [

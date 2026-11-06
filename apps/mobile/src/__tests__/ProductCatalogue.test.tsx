@@ -10,7 +10,7 @@ const sampleProduct: Product = {
   description: "Handcrafted authentic leather sandals",
   category: "Footwear",
   price: 2500,
-  currency: "KES",
+  currency: "ETB",
   inStock: true,
   stockCount: 15,
   images: [

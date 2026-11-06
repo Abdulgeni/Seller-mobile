@@ -1,7 +1,13 @@
 import { z } from "zod";
 import { CurrencyCodeSchema, IsoDateTimeSchema, VendorScopeSchema } from "./common";
 
-export const MsisdnSchema = z.string().regex(/^\+?[1-9]\d{9,14}$/, "Invalid MSISDN phone format (E.164 required)");
+export const MsisdnSchema = z.string().regex(
+  /^(\+?251[79]\d{8}|0[79]\d{8}|\+?[1-9]\d{8,14})$/,
+  "Invalid phone format (Ethiopian +251 9... / +251 7... / 09... / 07... or standard international required)"
+);
+
+export const PaymentProviderSchema = z.enum(["TELEBIRR", "CBE", "MPESA"]);
+export type PaymentProvider = z.infer<typeof PaymentProviderSchema>;
 
 export const PaymentStateSchema = z.enum([
   "IDLE",
@@ -25,8 +31,10 @@ export const PaymentFailureReasonSchema = z.enum([
 export const PaymentInitiationRequestSchema = VendorScopeSchema.extend({
   orderId: z.string().min(1),
   amount: z.number().positive(),
-  currency: CurrencyCodeSchema.default("KES"),
+  currency: CurrencyCodeSchema.default("ETB"),
   customerPhone: MsisdnSchema,
+  provider: PaymentProviderSchema.default("TELEBIRR"),
+  accountNumber: z.string().optional(),
   idempotencyKey: z.string().uuid(),
 });
 
@@ -34,8 +42,9 @@ export const PaymentTransactionSchema = VendorScopeSchema.extend({
   id: z.string().min(1),
   orderId: z.string().min(1),
   amount: z.number().positive(),
-  currency: CurrencyCodeSchema.default("KES"),
+  currency: CurrencyCodeSchema.default("ETB"),
   customerPhone: MsisdnSchema,
+  provider: PaymentProviderSchema.default("TELEBIRR"),
   state: PaymentStateSchema,
   failureReason: PaymentFailureReasonSchema.optional(),
   providerReference: z.string().optional(),

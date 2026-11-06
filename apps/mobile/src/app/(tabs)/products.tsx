@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import * as Haptics from "expo-haptics";
 import { router } from "expo-router";
@@ -14,8 +14,9 @@ const CATEGORY_CHIPS: { label: string; value?: ProductCategory | undefined }[] =
   { label: "Apparel", value: "Apparel" },
   { label: "Footwear", value: "Footwear" },
   { label: "Accessories", value: "Accessories" },
-  { label: "Electronics", value: "Electronics" },
-  { label: "Home & Living", value: "Home & Living" },
+  { label: "Coffee", value: "Specialty Coffee" },
+  { label: "Jewelry", value: "Jewelry" },
+  { label: "Home", value: "Home & Living" },
   { label: "Beauty", value: "Beauty & Personal Care" },
 ];
 
@@ -33,10 +34,13 @@ export default function ProductsScreen(): React.JSX.Element {
 
   const queryClient = useQueryClient();
 
-  const queryFilters = {
-    category: selectedCategory,
-    search: search || undefined,
-  };
+  const queryFilters = useMemo(
+    () => ({
+      category: selectedCategory,
+      search: search || undefined,
+    }),
+    [selectedCategory, search]
+  );
 
   const { data: products = [], isLoading, isError, error, isStale, refetch } = useQuery({
     queryKey: queryKeys.products.list(queryFilters),
@@ -402,7 +406,7 @@ export default function ProductsScreen(): React.JSX.Element {
               value={newPriceText}
               onChangeText={setNewPriceText}
               keyboardType="numeric"
-              placeholder="Enter new price in KES"
+              placeholder="Enter new price in ETB"
             />
             <View style={styles.modalButtons}>
               <Button
@@ -433,7 +437,7 @@ export default function ProductsScreen(): React.JSX.Element {
               value={batchPriceText}
               onChangeText={setBatchPriceText}
               keyboardType="numeric"
-              placeholder="New unit price in KES"
+              placeholder="New unit price in ETB"
             />
             <View style={styles.modalButtons}>
               <Button
