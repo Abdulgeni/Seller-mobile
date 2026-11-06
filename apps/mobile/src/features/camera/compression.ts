@@ -35,18 +35,6 @@ interface NativeCompressorModule {
 }
 
 function getNativeCompressor(): NativeCompressorModule | null {
-  if (isRunningInExpoGo()) {
-    return null;
-  }
-  try {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const mod = require("react-native-compressor") as { Image?: NativeCompressorModule } | undefined;
-    if (mod && typeof mod.Image?.compress === "function") {
-      return mod.Image;
-    }
-  } catch {
-    // Native TurboModule / NitroModules not available in current runtime (e.g. standard Expo Go)
-  }
   return null;
 }
 

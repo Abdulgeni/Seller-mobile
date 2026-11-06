@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Seller Mobile",
-    "slug": "seller-mobile",
+    "slug": "seller-mobile-monorepo",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -17,7 +17,12 @@
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "package": "com.seller.mobile"
+      "package": "com.uskuplu.sellermobilemonorepo"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "a64245ad-b73b-4b54-8084-39dec5d69b84"
+      }
     },
     "web": {
       "favicon": "./assets/favicon.png"
