@@ -8,7 +8,8 @@
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",
     "start": "pnpm --filter @repo/mobile start",
-    "android": "pnpm --filter @repo/mobile android"
+    "android": "pnpm --filter @repo/mobile android",
+    "build:apk": "cd apps/mobile && npx eas-cli build -p android --profile preview"
   },
   "devDependencies": {
     "turbo": "^2.4.4",

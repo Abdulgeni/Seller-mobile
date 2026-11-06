@@ -17,11 +17,11 @@
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "package": "com.uskuplu.sellermobilemonorepo"
+      "package": "com.uskuplusteam.sellermobilemonorepo"
     },
     "extra": {
       "eas": {
-        "projectId": "a64245ad-b73b-4b54-8084-39dec5d69b84"
+        "projectId": "7a3b7e43-a9fb-4d20-a713-1efeab1bb3ea"
       }
     },
     "web": {
