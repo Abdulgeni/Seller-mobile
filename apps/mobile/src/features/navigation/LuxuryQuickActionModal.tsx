@@ -11,6 +11,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { hapticFeedback, tokens } from "@repo/ui";
 import { useCommandPaletteStore } from "../command/commandStore";
+import { useAppTheme } from "../theme/ThemeContext";
 
 export interface LuxuryQuickActionModalProps {
   visible: boolean;
@@ -23,6 +24,7 @@ export function LuxuryQuickActionModal({
   onClose,
   onOpenStorefront,
 }: LuxuryQuickActionModalProps): React.JSX.Element {
+  const { isDark, colors } = useAppTheme();
   const openCommandPalette = useCommandPaletteStore((s) => s.open);
 
   const handleAction = (callback: () => void) => {
@@ -37,7 +39,7 @@ export function LuxuryQuickActionModal({
       title: "Add Luxury Product (AI Studio)",
       subtitle: "Capture with Carrara Marble & Velvet backdrops",
       icon: "camera" as const,
-      color: tokens.colors.light.accent,
+      color: colors.accent,
       badge: "AI 2.0",
       action: () => router.push("/products/create"),
     },
@@ -46,7 +48,7 @@ export function LuxuryQuickActionModal({
       title: "Telebirr & CBE Payment Terminal",
       subtitle: "Instant settlement via National Payment Switch",
       icon: "card" as const,
-      color: tokens.colors.light.gold,
+      color: colors.gold,
       badge: "ETB Birr",
       action: () => router.push("/orders/ord_1"),
     },
@@ -55,7 +57,7 @@ export function LuxuryQuickActionModal({
       title: "Universal Command Palette (⌘K)",
       subtitle: "Instant search across items, orders and ops",
       icon: "search" as const,
-      color: tokens.colors.light.primary,
+      color: colors.accent,
       badge: "⌘K",
       action: () => openCommandPalette(),
     },
@@ -64,7 +66,7 @@ export function LuxuryQuickActionModal({
       title: "Live Customer Storefront View",
       subtitle: "Preview Addis Ababa boutique perspective",
       icon: "eye" as const,
-      color: tokens.colors.light.accent,
+      color: colors.gold,
       badge: "Live View",
       action: () => onOpenStorefront(),
     },
@@ -73,7 +75,7 @@ export function LuxuryQuickActionModal({
       title: "Financial Vault & Settlements",
       subtitle: "Biometric balance and batch payouts",
       icon: "shield-checkmark" as const,
-      color: tokens.colors.light.gold,
+      color: colors.gold,
       badge: "Biometric",
       action: () => router.push("/payouts"),
     },
@@ -82,18 +84,29 @@ export function LuxuryQuickActionModal({
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <Pressable style={styles.overlay} onPress={onClose}>
-        <Pressable style={styles.sheet} onPress={(e) => e.stopPropagation()}>
-          {/* Header handle & gold accent */}
+        <Pressable
+          style={[
+            styles.sheet,
+            {
+              backgroundColor: colors.bgSurface,
+              borderColor: isDark ? "rgba(245, 158, 11, 0.25)" : "rgba(217, 119, 6, 0.2)",
+            },
+          ]}
+          onPress={(e) => e.stopPropagation()}
+        >
+          {/* Header handle */}
           <View style={styles.handleContainer}>
-            <View style={styles.handle} />
+            <View style={[styles.handle, { backgroundColor: colors.borderStrong }]} />
           </View>
 
           <View style={styles.header}>
             <View style={styles.headerTitleRow}>
-              <Text style={styles.brandEmblem}>✦</Text>
-              <Text style={styles.title}>Atelier Quick Actions</Text>
+              <View style={[styles.emblemBadge, { backgroundColor: isDark ? "rgba(245, 158, 11, 0.15)" : "#FEF3C7" }]}>
+                <Ionicons name="sparkles" size={14} color={colors.gold} />
+              </View>
+              <Text style={[styles.title, { color: colors.textPrimary }]}>Atelier Quick Actions</Text>
             </View>
-            <Text style={styles.subtitle}>
+            <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
               Instant operations for Addis Ababa Boutique Flagship
             </Text>
           </View>
@@ -102,39 +115,45 @@ export function LuxuryQuickActionModal({
             {actions.map((item) => (
               <TouchableOpacity
                 key={item.id}
-                style={styles.actionCard}
+                style={[
+                  styles.actionCard,
+                  {
+                    backgroundColor: colors.bgRaised,
+                    borderColor: isDark ? "rgba(245, 158, 11, 0.2)" : "rgba(217, 119, 6, 0.15)",
+                  },
+                ]}
                 activeOpacity={0.7}
                 onPress={() => handleAction(item.action)}
               >
-                <View style={[styles.iconBox, { backgroundColor: `${item.color}15` }]}>
+                <View style={[styles.iconBox, { backgroundColor: isDark ? "rgba(245, 158, 11, 0.15)" : "rgba(217, 119, 6, 0.12)" }]}>
                   <Ionicons name={item.icon} size={22} color={item.color} />
                 </View>
                 <View style={styles.actionContent}>
                   <View style={styles.actionTopRow}>
-                    <Text style={styles.actionTitle}>{item.title}</Text>
-                    <View style={styles.actionBadge}>
+                    <Text style={[styles.actionTitle, { color: colors.textPrimary }]}>{item.title}</Text>
+                    <View style={[styles.actionBadge, { backgroundColor: isDark ? "rgba(245, 158, 11, 0.15)" : "#FEF3C7" }]}>
                       <Text style={[styles.actionBadgeText, { color: item.color }]}>
                         {item.badge}
                       </Text>
                     </View>
                   </View>
-                  <Text style={styles.actionSubtitle}>{item.subtitle}</Text>
+                  <Text style={[styles.actionSubtitle, { color: colors.textSecondary }]}>{item.subtitle}</Text>
                 </View>
                 <Ionicons
                   name="chevron-forward"
                   size={16}
-                  color={tokens.colors.light.contentMuted}
+                  color={colors.gold}
                 />
               </TouchableOpacity>
             ))}
           </View>
 
           <TouchableOpacity
-            style={styles.dismissButton}
+            style={[styles.dismissButton, { backgroundColor: colors.bgRaised, borderColor: colors.borderSubtle }]}
             activeOpacity={0.8}
             onPress={onClose}
           >
-            <Text style={styles.dismissText}>Close</Text>
+            <Text style={[styles.dismissText, { color: colors.textPrimary }]}>Close</Text>
           </TouchableOpacity>
         </Pressable>
       </Pressable>
@@ -145,15 +164,13 @@ export function LuxuryQuickActionModal({
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: tokens.colors.light.bgOverlay,
+    backgroundColor: "rgba(11, 14, 20, 0.6)",
     justifyContent: "flex-end",
   },
   sheet: {
-    backgroundColor: tokens.colors.dark.bgSurface,
     borderTopLeftRadius: 28,
     borderTopRightRadius: 28,
-    borderWidth: 1,
-    borderColor: "rgba(217, 119, 6, 0.2)",
+    borderWidth: 1.5,
     paddingHorizontal: tokens.spacing.lg,
     paddingBottom: tokens.spacing.xl,
     paddingTop: tokens.spacing.sm,
@@ -166,8 +183,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 4,
     borderRadius: 2,
-    backgroundColor: tokens.colors.light.contentMuted,
-    opacity: 0.4,
+    opacity: 0.6,
   },
   header: {
     marginVertical: tokens.spacing.md,
@@ -175,21 +191,22 @@ const styles = StyleSheet.create({
   headerTitleRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: tokens.spacing.xs,
+    gap: tokens.spacing.xs + 2,
   },
-  brandEmblem: {
-    fontSize: 16,
-    color: tokens.colors.light.gold,
+  emblemBadge: {
+    width: 26,
+    height: 26,
+    borderRadius: 8,
+    alignItems: "center",
+    justifyContent: "center",
   },
   title: {
     fontSize: 18,
     fontWeight: "800",
-    color: tokens.colors.dark.textPrimary,
     letterSpacing: 0.3,
   },
   subtitle: {
     fontSize: 12,
-    color: tokens.colors.dark.textSecondary,
     marginTop: 2,
   },
   actionList: {
@@ -199,11 +216,9 @@ const styles = StyleSheet.create({
   actionCard: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: tokens.colors.dark.bgRaised,
-    borderRadius: tokens.radii.lg,
+    borderRadius: 16,
     padding: tokens.spacing.md,
     borderWidth: 1,
-    borderColor: tokens.colors.dark.borderSubtle,
   },
   iconBox: {
     width: 44,
@@ -223,15 +238,13 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   actionTitle: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: "700",
-    color: tokens.colors.dark.textPrimary,
   },
   actionBadge: {
-    paddingHorizontal: 6,
+    paddingHorizontal: 7,
     paddingVertical: 2,
     borderRadius: 6,
-    backgroundColor: "rgba(255, 255, 255, 0.06)",
   },
   actionBadgeText: {
     fontSize: 10,
@@ -240,19 +253,15 @@ const styles = StyleSheet.create({
   },
   actionSubtitle: {
     fontSize: 11,
-    color: tokens.colors.dark.textSecondary,
   },
   dismissButton: {
-    backgroundColor: tokens.colors.dark.bgRaised,
-    borderRadius: tokens.radii.md,
+    borderRadius: tokens.radii.full,
     paddingVertical: tokens.spacing.md,
     alignItems: "center",
     borderWidth: 1,
-    borderColor: tokens.colors.dark.borderSubtle,
   },
   dismissText: {
     fontSize: 14,
     fontWeight: "700",
-    color: tokens.colors.dark.textSecondary,
   },
 });

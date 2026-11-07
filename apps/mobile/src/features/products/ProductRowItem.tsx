@@ -1,8 +1,10 @@
 import React, { memo } from "react";
 import { Image, Pressable, StyleSheet, Switch, Text, View } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import type { Product } from "@repo/schemas";
-import { Card, hapticFeedback, t, tokens } from "@repo/ui";
+import { hapticFeedback, t, tokens } from "@repo/ui";
+import { useAppTheme } from "../theme/ThemeContext";
 
 interface ProductRowItemProps {
   product: Product;
@@ -23,6 +25,7 @@ export const ProductRowItem = memo(function ProductRowItem({
   onSelect,
   onLongPress,
 }: ProductRowItemProps): React.JSX.Element {
+  const { isDark, colors } = useAppTheme();
   const coverImage = product.images.find((img) => img.isCover) ?? product.images[0];
   const thumbnailUri = coverImage?.thumbnailUri ?? coverImage?.uri;
 
@@ -42,57 +45,112 @@ export const ProductRowItem = memo(function ProductRowItem({
 
   return (
     <Pressable onPress={handlePressCard} onLongPress={handleLongPressCard}>
-      <Card style={[styles.card, isSelected && styles.cardSelected]}>
+      <View
+        style={[
+          styles.card,
+          {
+            backgroundColor: colors.bgSurface,
+            borderColor: isSelected
+              ? colors.gold
+              : isDark
+              ? "rgba(245, 158, 11, 0.2)"
+              : "rgba(217, 119, 6, 0.16)",
+          },
+          isSelected && {
+            backgroundColor: isDark ? "rgba(245, 158, 11, 0.12)" : "#FEF3C7",
+          },
+        ]}
+      >
         <View style={styles.row}>
           {isSelectMode && (
-            <View style={[styles.checkbox, isSelected && styles.checkboxSelected]}>
-              {isSelected && <Text style={styles.checkmark}>✓</Text>}
+            <View
+              style={[
+                styles.checkbox,
+                {
+                  borderColor: isSelected ? colors.gold : colors.borderStrong,
+                  backgroundColor: isSelected ? colors.gold : colors.bgSurface,
+                },
+              ]}
+            >
+              {isSelected && (
+                <Ionicons
+                  name="checkmark"
+                  size={14}
+                  color={isDark ? "#0A0D14" : "#FFFFFF"}
+                />
+              )}
             </View>
           )}
 
           {thumbnailUri ? (
             <Image
               source={{ uri: thumbnailUri }}
-              style={styles.thumbnail}
+              style={[
+                styles.thumbnail,
+                {
+                  borderColor: isDark ? "rgba(245, 158, 11, 0.25)" : "rgba(217, 119, 6, 0.2)",
+                },
+              ]}
               resizeMode="cover"
             />
           ) : (
-            <View style={styles.thumbnailPlaceholder}>
-              <Text style={{ fontSize: 20 }}>📦</Text>
+            <View
+              style={[
+                styles.thumbnailPlaceholder,
+                {
+                  backgroundColor: colors.bgRaised,
+                  borderColor: isDark ? "rgba(245, 158, 11, 0.25)" : "rgba(217, 119, 6, 0.2)",
+                },
+              ]}
+            >
+              <Ionicons name="sparkles" size={22} color={colors.gold} />
             </View>
           )}
 
           <View style={styles.content}>
-            <Text style={styles.title} numberOfLines={1}>
+            <Text style={[styles.title, { color: colors.textPrimary }]} numberOfLines={1}>
               {product.title}
             </Text>
-            <Text style={styles.category}>{product.category}</Text>
+            <Text style={[styles.category, { color: colors.textSecondary }]}>{product.category}</Text>
 
             <View style={styles.priceRow}>
               <Pressable
-                onPress={() => onQuickEditPrice(product)}
-                style={styles.priceContainer}
+                onPress={() => {
+                  hapticFeedback.selection();
+                  onQuickEditPrice(product);
+                }}
+                style={[
+                  styles.priceContainer,
+                  {
+                    backgroundColor: colors.bgRaised,
+                    borderColor: isDark ? "rgba(245, 158, 11, 0.25)" : "rgba(217, 119, 6, 0.2)",
+                  },
+                ]}
                 accessibilityRole="button"
                 accessibilityLabel={`Edit price for ${product.title}`}
               >
-                <Text style={styles.price}>
-                  {product.currency} {product.price.toLocaleString()}
+                <Text style={[styles.price, { color: colors.textPrimary }]}>
+                  <Text style={{ color: colors.gold, fontSize: 11, fontWeight: "700" }}>{product.currency} </Text>
+                  {product.price.toLocaleString()}
                 </Text>
-                <Text style={styles.editPriceHint}>✏️</Text>
+                <Ionicons name="pencil-outline" size={11} color={colors.gold} style={{ marginLeft: 4 }} />
               </Pressable>
 
               <View style={styles.stockToggle}>
-                <Text style={styles.stockLabel}>
+                <Text style={[styles.stockLabel, { color: product.inStock ? colors.accent : colors.textTertiary }]}>
                   {product.inStock ? t("products.inStock") : t("products.outOfStock")}
                 </Text>
                 <Switch
                   value={product.inStock}
-                  onValueChange={(val) => onToggleStock(product.id, val)}
-                  trackColor={{
-                    false: tokens.colors.light.border,
-                    true: tokens.colors.light.success,
+                  onValueChange={(val) => {
+                    hapticFeedback.selection();
+                    onToggleStock(product.id, val);
                   }}
-                  thumbColor={tokens.colors.light.surface}
+                  trackColor={{
+                    false: colors.borderSubtle,
+                    true: colors.accent,
+                  }}
+                  thumbColor={isDark ? "#F2F5FA" : "#FFFFFF"}
                   disabled={isSelectMode}
                 />
               </View>
@@ -101,81 +159,74 @@ export const ProductRowItem = memo(function ProductRowItem({
 
           {!isSelectMode && (
             <Pressable
-              onPress={() => router.push(`/products/${product.id}`)}
+              onPress={() => {
+                hapticFeedback.selection();
+                router.push(`/products/${product.id}`);
+              }}
               style={styles.detailChevron}
               accessibilityRole="button"
               accessibilityLabel={`View full details for ${product.title}`}
             >
-              <Text style={styles.chevronText}>›</Text>
+              <Ionicons name="chevron-forward" size={18} color={colors.gold} />
             </Pressable>
           )}
         </View>
-      </Card>
+      </View>
     </Pressable>
   );
 });
 
 const styles = StyleSheet.create({
   card: {
+    borderRadius: 16,
+    borderWidth: 1,
+    padding: tokens.spacing.sm + 2,
     marginBottom: tokens.spacing.sm,
-  },
-  cardSelected: {
-    borderColor: tokens.colors.light.accent,
-    backgroundColor: tokens.colors.light.bgRaised,
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 4,
   },
   row: {
     flexDirection: "row",
     alignItems: "center",
   },
   checkbox: {
-    width: 22,
-    height: 22,
-    borderRadius: tokens.radii.full,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
     borderWidth: 1.5,
-    borderColor: tokens.colors.light.borderStrong,
     marginRight: tokens.spacing.sm,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: tokens.colors.light.bgCanvas,
-  },
-  checkboxSelected: {
-    backgroundColor: tokens.colors.light.accent,
-    borderColor: tokens.colors.light.accent,
-  },
-  checkmark: {
-    color: tokens.colors.light.surface,
-    fontSize: 12,
-    fontWeight: "700",
   },
   thumbnail: {
     width: 64,
     height: 64,
-    borderRadius: tokens.radii.sm,
-    backgroundColor: tokens.colors.light.surfaceSubtle,
+    borderRadius: 12,
+    borderWidth: 1,
   },
   thumbnailPlaceholder: {
     width: 64,
     height: 64,
-    borderRadius: tokens.radii.sm,
-    backgroundColor: tokens.colors.light.surfaceSubtle,
+    borderRadius: 12,
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 1,
-    borderColor: tokens.colors.light.border,
   },
   content: {
     flex: 1,
-    marginLeft: tokens.spacing.sm,
+    marginLeft: tokens.spacing.sm + 2,
     justifyContent: "center",
   },
   title: {
     fontSize: 14,
     fontWeight: "700",
-    color: tokens.colors.light.contentPrimary,
+    letterSpacing: 0.2,
   },
   category: {
-    fontSize: 12,
-    color: tokens.colors.light.contentSecondary,
+    fontSize: 11,
     marginTop: 2,
   },
   priceRow: {
@@ -187,39 +238,29 @@ const styles = StyleSheet.create({
   priceContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: tokens.colors.light.bgRaised,
-    paddingHorizontal: tokens.spacing.xs,
-    paddingVertical: 2,
-    borderRadius: tokens.radii.sm,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 8,
     borderWidth: 1,
-    borderColor: tokens.colors.light.borderSubtle,
   },
   price: {
     fontSize: 13,
     fontWeight: "700",
-    color: tokens.colors.light.contentPrimary,
     fontVariant: ["tabular-nums"],
-  },
-  editPriceHint: {
-    fontSize: 10,
-    marginLeft: 4,
   },
   stockToggle: {
     flexDirection: "row",
     alignItems: "center",
   },
   stockLabel: {
-    fontSize: 12,
-    color: tokens.colors.light.contentSecondary,
+    fontSize: 11,
+    fontWeight: "600",
     marginRight: tokens.spacing.xs,
   },
   detailChevron: {
-    paddingHorizontal: tokens.spacing.sm,
+    paddingHorizontal: 6,
     paddingVertical: tokens.spacing.md,
-  },
-  chevronText: {
-    fontSize: 20,
-    color: tokens.colors.light.contentMuted,
-    fontWeight: "600",
+    alignItems: "center",
+    justifyContent: "center",
   },
 });

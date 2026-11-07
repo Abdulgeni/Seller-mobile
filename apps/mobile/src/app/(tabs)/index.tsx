@@ -26,9 +26,11 @@ import {
 import { useCommandPaletteStore } from "../../features/command/commandStore";
 import { useNotificationStore } from "../../features/notifications/notificationStore";
 import { StorefrontPreviewModal } from "../../features/storefront/StorefrontPreviewModal";
+import { useAppTheme } from "../../features/theme/ThemeContext";
 
 export default function DashboardScreen(): React.JSX.Element {
   const insets = useSafeAreaInsets();
+  const { colors, isDark, toggleTheme } = useAppTheme();
   const [showStorefrontPreview, setShowStorefrontPreview] = useState(false);
   const unreadNotificationCount = useNotificationStore((s) => s.unreadCount);
 
@@ -44,7 +46,12 @@ export default function DashboardScreen(): React.JSX.Element {
 
   if (isLoading) {
     return (
-      <View style={[styles.container, { paddingTop: Math.max(insets.top, 16) }]}>
+      <View
+        style={[
+          styles.container,
+          { paddingTop: Math.max(insets.top, 16), backgroundColor: colors.bgCanvas },
+        ]}
+      >
         <Skeleton height={140} borderRadius={tokens.radii.lg} />
         <View style={{ height: tokens.spacing.md }} />
         <Skeleton height={110} borderRadius={tokens.radii.md} />
@@ -56,7 +63,12 @@ export default function DashboardScreen(): React.JSX.Element {
 
   if (isError || !kpis) {
     return (
-      <View style={[styles.container, { paddingTop: Math.max(insets.top, 16) }]}>
+      <View
+        style={[
+          styles.container,
+          { paddingTop: Math.max(insets.top, 16), backgroundColor: colors.bgCanvas },
+        ]}
+      >
         <EmptyState
           title={t("common.error")}
           description={error instanceof Error ? error.message : "Failed to load dashboard KPIs"}
@@ -71,7 +83,11 @@ export default function DashboardScreen(): React.JSX.Element {
     <ScrollView
       contentContainerStyle={[
         styles.container,
-        { paddingTop: Math.max(insets.top, 16), paddingBottom: 110 },
+        {
+          paddingTop: Math.max(insets.top, 16),
+          paddingBottom: 110,
+          backgroundColor: colors.bgCanvas,
+        },
       ]}
       showsVerticalScrollIndicator={false}
     >
@@ -79,16 +95,56 @@ export default function DashboardScreen(): React.JSX.Element {
       <View style={styles.luxuryHeader}>
         <View style={styles.headerBrandRow}>
           <View style={styles.brandTitleBox}>
-            <View style={styles.emblemBadge}>
+            <View
+              style={[
+                styles.emblemBadge,
+                {
+                  backgroundColor: isDark ? "rgba(245, 158, 11, 0.15)" : tokens.colors.light.goldSubtle,
+                  borderColor: tokens.colors.light.gold,
+                },
+              ]}
+            >
               <Text style={styles.emblemText}>✦</Text>
             </View>
             <View>
-              <Text style={styles.brandTitle}>ATELIER HABESHA</Text>
-              <Text style={styles.brandSubtitle}>ADDIS ABABA · FLAGSHIP BOUTIQUE</Text>
+              <Text style={[styles.brandTitle, { color: colors.textPrimary }]}>
+                ATELIER HABESHA
+              </Text>
+              <Text style={[styles.brandSubtitle, { color: colors.textSecondary }]}>
+                ADDIS ABABA · FLAGSHIP BOUTIQUE
+              </Text>
             </View>
           </View>
 
           <View style={styles.headerActions}>
+            {/* Day / Night Theme Toggle */}
+            <TouchableOpacity
+              accessibilityRole="button"
+              accessibilityLabel={isDark ? "Switch to Day Mode" : "Switch to Night Mode"}
+              onPress={toggleTheme}
+              style={[
+                styles.themeTogglePill,
+                {
+                  backgroundColor: isDark ? "rgba(245, 158, 11, 0.15)" : tokens.colors.light.bgRaised,
+                  borderColor: isDark ? tokens.colors.light.gold : tokens.colors.light.borderSubtle,
+                },
+              ]}
+            >
+              <Ionicons
+                name={isDark ? "moon" : "sunny"}
+                size={14}
+                color={isDark ? tokens.colors.light.gold : tokens.colors.light.contentPrimary}
+              />
+              <Text
+                style={[
+                  styles.themeToggleText,
+                  { color: isDark ? tokens.colors.light.gold : tokens.colors.light.contentPrimary },
+                ]}
+              >
+                {isDark ? "Night" : "Day"}
+              </Text>
+            </TouchableOpacity>
+
             <TouchableOpacity
               accessibilityRole="button"
               accessibilityLabel="Search Command Palette"
@@ -96,9 +152,15 @@ export default function DashboardScreen(): React.JSX.Element {
                 hapticFeedback.buttonPress();
                 useCommandPaletteStore.getState().open();
               }}
-              style={styles.headerIconButton}
+              style={[
+                styles.headerIconButton,
+                {
+                  backgroundColor: colors.bgRaised,
+                  borderColor: colors.borderSubtle,
+                },
+              ]}
             >
-              <Ionicons name="search" size={18} color={tokens.colors.light.contentPrimary} />
+              <Ionicons name="search" size={17} color={colors.textPrimary} />
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -108,12 +170,18 @@ export default function DashboardScreen(): React.JSX.Element {
                 hapticFeedback.buttonPress();
                 router.push("/orders");
               }}
-              style={styles.headerIconButton}
+              style={[
+                styles.headerIconButton,
+                {
+                  backgroundColor: colors.bgRaised,
+                  borderColor: colors.borderSubtle,
+                },
+              ]}
             >
               <Ionicons
                 name="notifications-outline"
-                size={18}
-                color={tokens.colors.light.contentPrimary}
+                size={17}
+                color={colors.textPrimary}
               />
               {unreadNotificationCount > 0 && (
                 <View style={styles.notificationDot} />
@@ -127,15 +195,30 @@ export default function DashboardScreen(): React.JSX.Element {
                 hapticFeedback.buttonPress();
                 setShowStorefrontPreview(true);
               }}
-              style={[styles.headerIconButton, styles.headerStorefrontButton]}
+              style={[
+                styles.headerIconButton,
+                styles.headerStorefrontButton,
+                {
+                  backgroundColor: isDark ? "rgba(245, 158, 11, 0.15)" : tokens.colors.light.goldSubtle,
+                  borderColor: tokens.colors.light.gold,
+                },
+              ]}
             >
-              <Ionicons name="eye-outline" size={18} color={tokens.colors.light.gold} />
+              <Ionicons name="eye-outline" size={17} color={tokens.colors.light.gold} />
             </TouchableOpacity>
           </View>
         </View>
 
         {/* Ethiopian National Payment Switch Live Status Pill */}
-        <View style={styles.marketStatusPill}>
+        <View
+          style={[
+            styles.marketStatusPill,
+            {
+              backgroundColor: isDark ? "rgba(16, 185, 129, 0.12)" : tokens.colors.light.accentSubtle,
+              borderColor: tokens.colors.light.accent,
+            },
+          ]}
+        >
           <View style={styles.liveIndicatorDot} />
           <Text style={styles.marketStatusText}>
             Live in Addis Ababa · Telebirr, CBE Birr & M-Pesa Active
@@ -144,14 +227,25 @@ export default function DashboardScreen(): React.JSX.Element {
       </View>
 
       {/* Boutique Sovereign Treasury Hero Card */}
-      <Card style={styles.treasuryHeroCard}>
+      <Card
+        style={[
+          styles.treasuryHeroCard,
+          {
+            backgroundColor: isDark ? tokens.colors.dark.bgSurface : tokens.colors.light.surface,
+            borderColor: "rgba(217, 119, 6, 0.35)",
+          },
+        ]}
+      >
         <View style={styles.treasuryTopRow}>
           <View>
             <Text style={styles.treasuryLabel}>TOTAL PORTFOLIO & REVENUE</Text>
             <NumericRoll
               value={kpis.revenueToday}
               prefix={`${kpis.currency} `}
-              style={styles.treasuryValue}
+              style={[
+                styles.treasuryValue,
+                { color: isDark ? tokens.colors.dark.textPrimary : tokens.colors.light.contentPrimary },
+              ]}
             />
           </View>
           <View style={styles.trendBadge}>
@@ -165,12 +259,24 @@ export default function DashboardScreen(): React.JSX.Element {
         <View style={styles.treasuryBottomRow}>
           <View style={styles.settlementStat}>
             <Text style={styles.settlementStatLabel}>Orders Settled</Text>
-            <Text style={styles.settlementStatValue}>{kpis.ordersTodayCount} Today</Text>
+            <Text
+              style={[
+                styles.settlementStatValue,
+                { color: isDark ? tokens.colors.dark.textPrimary : tokens.colors.light.contentPrimary },
+              ]}
+            >
+              {kpis.ordersTodayCount} Today
+            </Text>
           </View>
           <View style={styles.settlementDividerVertical} />
           <View style={styles.settlementStat}>
             <Text style={styles.settlementStatLabel}>Pending Payout</Text>
-            <Text style={styles.settlementStatValue}>
+            <Text
+              style={[
+                styles.settlementStatValue,
+                { color: isDark ? tokens.colors.dark.textPrimary : tokens.colors.light.contentPrimary },
+              ]}
+            >
               {kpis.currency} {kpis.pendingPayoutAmount.toLocaleString()}
             </Text>
           </View>
@@ -189,37 +295,62 @@ export default function DashboardScreen(): React.JSX.Element {
 
       {/* Secondary KPI Grid */}
       <View style={styles.kpiGrid}>
-        <Card style={styles.kpiCard}>
-          <Text style={styles.kpiLabel}>{t("dashboard.ordersToday")}</Text>
+        <View
+          style={[
+            styles.kpiCard,
+            {
+              backgroundColor: colors.bgSurface,
+              borderColor: isDark ? "rgba(245, 158, 11, 0.2)" : "rgba(217, 119, 6, 0.16)",
+            },
+          ]}
+        >
+          <Text style={[styles.kpiLabel, { color: colors.textSecondary }]}>{t("dashboard.ordersToday")}</Text>
           <NumericRoll
             value={kpis.ordersTodayCount}
-            style={styles.kpiValue}
+            style={[styles.kpiValue, { color: colors.textPrimary }]}
           />
-          <Text style={styles.kpiSubtext}>
+          <Text style={[styles.kpiSubtext, { color: colors.textTertiary }]}>
             {kpis.ordersPendingAcceptanceCount} awaiting acceptance
           </Text>
-        </Card>
+        </View>
 
-        <Card style={styles.kpiCard}>
-          <Text style={styles.kpiLabel}>{t("dashboard.lowStock")}</Text>
+        <View
+          style={[
+            styles.kpiCard,
+            {
+              backgroundColor: colors.bgSurface,
+              borderColor: isDark ? "rgba(245, 158, 11, 0.2)" : "rgba(217, 119, 6, 0.16)",
+            },
+          ]}
+        >
+          <Text style={[styles.kpiLabel, { color: colors.textSecondary }]}>{t("dashboard.lowStock")}</Text>
           <NumericRoll
             value={kpis.lowStockItemsCount}
-            style={[styles.kpiValue, { color: tokens.colors.light.danger }]}
+            style={[styles.kpiValue, { color: colors.critical }]}
           />
-          <Text style={styles.kpiSubtext}>Needs re-order</Text>
-        </Card>
+          <Text style={[styles.kpiSubtext, { color: colors.textTertiary }]}>Needs re-order</Text>
+        </View>
       </View>
 
       {/* 7-Day Revenue Trend (Pre-aggregated Server Series) */}
-      <Card style={styles.chartCard}>
-        <Text style={styles.chartTitle}>{t("dashboard.revenueTrend")}</Text>
+      <View
+        style={[
+          styles.chartCard,
+          {
+            backgroundColor: colors.bgSurface,
+            borderColor: isDark ? "rgba(245, 158, 11, 0.2)" : "rgba(217, 119, 6, 0.16)",
+          },
+        ]}
+      >
+        <Text style={[styles.chartTitle, { color: colors.textPrimary }]}>{t("dashboard.revenueTrend")}</Text>
         <View style={styles.chartBars}>
           {kpis.revenue7DaysSeries.map((point) => {
             const maxRev = 200000;
             const barHeight = Math.min(100, Math.max(12, (point.revenue / maxRev) * 100));
+            const isHighest = point.label === "Tue";
             return (
               <View key={point.date} style={styles.barColumn}>
-                <Text style={styles.barValue}>
+                <Text style={[styles.barValue, { color: colors.textTertiary }]}>
                   {Math.round(point.revenue / 1000)}k
                 </Text>
                 <View
@@ -227,38 +358,48 @@ export default function DashboardScreen(): React.JSX.Element {
                     styles.barFill,
                     {
                       height: barHeight,
-                      backgroundColor:
-                        point.label === "Tue"
-                          ? tokens.colors.light.primary
-                          : tokens.colors.light.borderFocus,
+                      backgroundColor: isHighest ? colors.gold : isDark ? "rgba(245, 158, 11, 0.25)" : colors.borderStrong,
                     },
                   ]}
                 />
-                <Text style={styles.barLabel}>{point.label}</Text>
+                <Text style={[styles.barLabel, { color: isHighest ? colors.gold : colors.textSecondary, fontWeight: isHighest ? "700" : "500" }]}>
+                  {point.label}
+                </Text>
               </View>
             );
           })}
         </View>
-      </Card>
+      </View>
 
       {/* Insights 2.0: Inventory Depletion Forecast */}
       {insights && (
-        <Card style={styles.insightsCard}>
+        <View
+          style={[
+            styles.insightsCard,
+            {
+              backgroundColor: colors.bgSurface,
+              borderColor: isDark ? "rgba(245, 158, 11, 0.2)" : "rgba(217, 119, 6, 0.16)",
+            },
+          ]}
+        >
           <View style={styles.insightsHeader}>
-            <Text style={styles.insightsTitle}>✦ Stock Runout Forecast</Text>
-            <Text style={styles.insightsSubtitle}>
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+              <Ionicons name="sparkles" size={15} color={colors.gold} />
+              <Text style={[styles.insightsTitle, { color: colors.textPrimary }]}>Stock Runout Forecast</Text>
+            </View>
+            <Text style={[styles.insightsSubtitle, { color: colors.textSecondary }]}>
               Predictive burn-rate analysis based on order velocity
             </Text>
           </View>
 
           <View style={styles.forecastList}>
             {insights.depletionForecasts.map((f) => (
-              <View key={f.productId} style={styles.forecastRow}>
+              <View key={f.productId} style={[styles.forecastRow, { borderBottomColor: colors.borderSubtle }]}>
                 <View style={styles.forecastMeta}>
-                  <Text style={styles.forecastTitle} numberOfLines={1}>
+                  <Text style={[styles.forecastTitle, { color: colors.textPrimary }]} numberOfLines={1}>
                     {f.title}
                   </Text>
-                  <Text style={styles.forecastSub}>
+                  <Text style={[styles.forecastSub, { color: colors.textSecondary }]}>
                     Stock: {f.currentStock} · Velocity: ~{f.dailyVelocity}/day
                   </Text>
                 </View>
@@ -282,31 +423,39 @@ export default function DashboardScreen(): React.JSX.Element {
               </View>
             ))}
           </View>
-        </Card>
+        </View>
       )}
 
       {/* Insights 2.0: Revenue Margin & Sparkline */}
       {insights && (
-        <Card style={styles.marginCard}>
+        <View
+          style={[
+            styles.marginCard,
+            {
+              backgroundColor: colors.bgSurface,
+              borderColor: isDark ? "rgba(245, 158, 11, 0.2)" : "rgba(217, 119, 6, 0.16)",
+            },
+          ]}
+        >
           <View style={styles.marginHeader}>
             <View>
-              <Text style={styles.marginTitle}>Net Settlement Margin</Text>
-              <Text style={styles.marginValue}>
+              <Text style={[styles.marginTitle, { color: colors.textSecondary }]}>Net Settlement Margin</Text>
+              <Text style={[styles.marginValue, { color: colors.textPrimary }]}>
                 {insights.revenueMargin.marginPercent}%
               </Text>
             </View>
             <View style={styles.marginStats}>
-              <Text style={styles.marginDetail}>
+              <Text style={[styles.marginDetail, { color: colors.textSecondary }]}>
                 Gross: {insights.revenueMargin.currency} {insights.revenueMargin.grossRevenue.toLocaleString()}
               </Text>
-              <Text style={styles.marginFee}>
-                Payment Gateway Fees: -{insights.revenueMargin.currency} {insights.revenueMargin.estimatedFees.toLocaleString()}
+              <Text style={[styles.marginFee, { color: colors.textTertiary }]}>
+                Gateway Fees: -{insights.revenueMargin.currency} {insights.revenueMargin.estimatedFees.toLocaleString()}
               </Text>
             </View>
           </View>
           <View style={{ height: tokens.spacing.sm }} />
           <SparklineChart data={insights.sparklineData} height={64} />
-        </Card>
+        </View>
       )}
 
       {/* Quick Ops Navigation */}
@@ -359,7 +508,6 @@ const styles = StyleSheet.create({
   container: {
     padding: tokens.spacing.md,
     gap: tokens.spacing.md,
-    backgroundColor: tokens.colors.light.bgCanvas,
   },
   luxuryHeader: {
     marginBottom: tokens.spacing.xs,
@@ -378,11 +526,9 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 8,
-    backgroundColor: tokens.colors.light.goldSubtle,
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 1,
-    borderColor: tokens.colors.light.gold,
   },
   emblemText: {
     fontSize: 16,
@@ -392,13 +538,11 @@ const styles = StyleSheet.create({
   brandTitle: {
     fontSize: 16,
     fontWeight: "900",
-    color: tokens.colors.light.contentPrimary,
     letterSpacing: 0.8,
   },
   brandSubtitle: {
     fontSize: 10,
     fontWeight: "600",
-    color: tokens.colors.light.contentSecondary,
     letterSpacing: 0.5,
   },
   headerActions: {
@@ -406,21 +550,29 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: tokens.spacing.xs,
   },
+  themeTogglePill: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 8,
+    paddingVertical: 6,
+    borderRadius: tokens.radii.full,
+    borderWidth: 1,
+    gap: 4,
+  },
+  themeToggleText: {
+    fontSize: 11,
+    fontWeight: "700",
+  },
   headerIconButton: {
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: tokens.colors.light.bgRaised,
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 1,
-    borderColor: tokens.colors.light.borderSubtle,
     position: "relative",
   },
-  headerStorefrontButton: {
-    backgroundColor: tokens.colors.light.goldSubtle,
-    borderColor: tokens.colors.light.gold,
-  },
+  headerStorefrontButton: {},
   notificationDot: {
     position: "absolute",
     top: 6,
@@ -433,14 +585,12 @@ const styles = StyleSheet.create({
   marketStatusPill: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: tokens.colors.light.accentSubtle,
     paddingHorizontal: tokens.spacing.sm,
     paddingVertical: 4,
     borderRadius: tokens.radii.full,
     alignSelf: "flex-start",
     marginTop: tokens.spacing.sm,
     borderWidth: 1,
-    borderColor: tokens.colors.light.accent,
   },
   liveIndicatorDot: {
     width: 6,
@@ -456,11 +606,9 @@ const styles = StyleSheet.create({
     letterSpacing: 0.2,
   },
   treasuryHeroCard: {
-    backgroundColor: tokens.colors.dark.bgSurface,
     padding: tokens.spacing.md,
     borderRadius: tokens.radii.lg,
     borderWidth: 1,
-    borderColor: "rgba(217, 119, 6, 0.35)",
   },
   treasuryTopRow: {
     flexDirection: "row",
@@ -476,7 +624,6 @@ const styles = StyleSheet.create({
   treasuryValue: {
     fontSize: 28,
     fontWeight: "800",
-    color: tokens.colors.dark.textPrimary,
     marginTop: 4,
     fontVariant: ["tabular-nums"],
   },
@@ -515,7 +662,6 @@ const styles = StyleSheet.create({
   settlementStatValue: {
     fontSize: 13,
     fontWeight: "700",
-    color: tokens.colors.dark.textPrimary,
     marginTop: 2,
   },
   settlementDividerVertical: {
@@ -544,30 +690,32 @@ const styles = StyleSheet.create({
   kpiCard: {
     flex: 1,
     minHeight: 100,
+    borderRadius: 18,
+    borderWidth: 1,
+    padding: tokens.spacing.md,
   },
   kpiLabel: {
     fontSize: 13,
-    color: tokens.colors.light.contentSecondary,
-    fontWeight: "500",
+    fontWeight: "600",
   },
   kpiValue: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: tokens.colors.light.contentPrimary,
+    fontSize: 22,
+    fontWeight: "800",
     marginTop: tokens.spacing.xs,
+    fontVariant: ["tabular-nums"],
   },
   kpiSubtext: {
     fontSize: 12,
-    color: tokens.colors.light.contentMuted,
     marginTop: tokens.spacing.xs,
   },
   chartCard: {
     padding: tokens.spacing.md,
+    borderRadius: 18,
+    borderWidth: 1,
   },
   chartTitle: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: tokens.colors.light.contentPrimary,
+    fontSize: 15,
+    fontWeight: "700",
     marginBottom: tokens.spacing.md,
   },
   chartBars: {
@@ -583,7 +731,6 @@ const styles = StyleSheet.create({
   },
   barValue: {
     fontSize: 10,
-    color: tokens.colors.light.contentMuted,
     marginBottom: 4,
   },
   barFill: {
@@ -592,9 +739,7 @@ const styles = StyleSheet.create({
   },
   barLabel: {
     fontSize: 12,
-    color: tokens.colors.light.contentSecondary,
     marginTop: tokens.spacing.xs,
-    fontWeight: "500",
   },
   actionsRow: {
     flexDirection: "row",
@@ -602,6 +747,8 @@ const styles = StyleSheet.create({
   },
   insightsCard: {
     padding: tokens.spacing.md,
+    borderRadius: 18,
+    borderWidth: 1,
   },
   insightsHeader: {
     marginBottom: tokens.spacing.sm,
@@ -609,12 +756,10 @@ const styles = StyleSheet.create({
   insightsTitle: {
     fontSize: 15,
     fontWeight: "700",
-    color: tokens.colors.light.contentPrimary,
     letterSpacing: 0.3,
   },
   insightsSubtitle: {
     fontSize: 12,
-    color: tokens.colors.light.contentSecondary,
     marginTop: 2,
   },
   forecastList: {
@@ -626,7 +771,6 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingVertical: tokens.spacing.xs,
     borderBottomWidth: 1,
-    borderBottomColor: tokens.colors.light.borderSubtle,
   },
   forecastMeta: {
     flex: 1,
@@ -635,15 +779,15 @@ const styles = StyleSheet.create({
   forecastTitle: {
     fontSize: 13,
     fontWeight: "600",
-    color: tokens.colors.light.contentPrimary,
   },
   forecastSub: {
     fontSize: 11,
-    color: tokens.colors.light.contentSecondary,
     marginTop: 1,
   },
   marginCard: {
     padding: tokens.spacing.md,
+    borderRadius: 18,
+    borderWidth: 1,
   },
   marginHeader: {
     flexDirection: "row",
