@@ -17,4 +17,11 @@ config.resolver.nodeModulesPaths = [
   path.resolve(monorepoRoot, 'node_modules'),
 ];
 
+// 3. Ensure singletons and root dependencies are pinned
+const singletons = ['react', 'react-native', 'expo', 'zod'];
+config.resolver.extraNodeModules = singletons.reduce((acc, name) => {
+  acc[name] = path.resolve(projectRoot, 'node_modules', name);
+  return acc;
+}, {});
+
 module.exports = config;
