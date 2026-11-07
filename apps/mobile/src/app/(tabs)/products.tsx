@@ -520,11 +520,11 @@ const styles = StyleSheet.create({
     fontWeight: "500",
   },
   listContent: {
-    paddingBottom: tokens.spacing.xl,
+    paddingBottom: 110,
   },
   batchBar: {
     position: "absolute",
-    bottom: tokens.spacing.lg,
+    bottom: 84,
     left: tokens.spacing.md,
     right: tokens.spacing.md,
     backgroundColor: tokens.colors.light.bgSurface,

@@ -58,6 +58,14 @@ export default defineConfig({
         find: "expo-secure-store",
         replacement: path.resolve(__dirname, "src/__tests__/security-shim.ts"),
       },
+      {
+        find: "@expo/vector-icons",
+        replacement: path.resolve(__dirname, "src/__tests__/icons-shim.ts"),
+      },
+      {
+        find: "react-native-safe-area-context",
+        replacement: path.resolve(__dirname, "src/__tests__/safe-area-shim.ts"),
+      },
     ],
   },
 });

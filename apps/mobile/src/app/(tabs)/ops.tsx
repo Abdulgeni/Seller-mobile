@@ -168,6 +168,7 @@ export default function OpsScreen(): React.JSX.Element {
 const styles = StyleSheet.create({
   container: {
     padding: tokens.spacing.md,
+    paddingBottom: 110,
     gap: tokens.spacing.md,
   },
   sectionHeader: {

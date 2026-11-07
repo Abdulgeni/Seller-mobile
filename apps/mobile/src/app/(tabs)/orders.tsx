@@ -182,7 +182,7 @@ export default function OrdersScreen(): React.JSX.Element {
           data={orders}
           renderItem={renderOrderItem}
           keyExtractor={(item) => item.id}
-          contentContainerStyle={{ paddingBottom: tokens.spacing.xl }}
+          contentContainerStyle={{ paddingBottom: 110 }}
         />
       )}
     </View>
