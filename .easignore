@@ -1,0 +1,40 @@
+# .easignore - Monorepo root ignore for EAS Build archive
+# Native generated folders (EAS managed cloud build performs prebuild)
+android/
+ios/
+apps/mobile/android/
+apps/mobile/ios/
+
+# Dependencies and caches
+node_modules/
+.pnpm-store/
+.turbo/
+.expo/
+.git/
+.github/
+.claude/
+dist/
+build/
+web-build/
+
+# Tests & mocks
+**/__tests__/**
+**/*.test.*
+**/*.spec.*
+
+# Documentation & non-build root assets
+docs/
+assets/
+*.md
+!package.json
+!apps/*/package.json
+!packages/*/package.json
+
+# Scripts & temporary lockfiles
+scripts/
+apps/mobile/scripts/
+apps/mobile/package-lock.json
+
+# Environment & logs
+.env*.local
+*.log
