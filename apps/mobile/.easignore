@@ -14,3 +14,7 @@ package-lock.json
 *.md
 .env*.local
 *.log
+
+# Explicitly ensure assets are never ignored
+!assets/
+!assets/**
