@@ -17,6 +17,8 @@ apps/mobile/ios/
 *.key
 *.mobileprovision
 *.orig.*
+*.apk
+*.aab
 
 # Environment
 .env
