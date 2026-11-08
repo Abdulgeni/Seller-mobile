@@ -24,9 +24,9 @@ const STEPS: OnboardingStep[] = [
   {
     stepNumber: 1,
     badge: "CRAFT & SPEED",
-    symbol: "✦",
-    title: "AI Studio & Luxury Artisan Catalogue",
-    subtitle: "Habesha textiles, highland leather & specialty coffee",
+    symbol: "۞",
+    title: "AI Studio & Halal Artisan Catalogue",
+    subtitle: "100% Certified Halal meats, organic essentials & modest fashion",
     description:
       "Capture high-resolution product photos with automated sub-200KB compression. Retouch in AI Studio with studio, marble, and velvet backdrops, rendered in FlashList at 60 FPS.",
     highlights: [
@@ -98,7 +98,7 @@ export function OnboardingModal(): React.JSX.Element | null {
       <View style={styles.container}>
         {/* Top Header */}
         <View style={styles.headerBar}>
-          <Text style={styles.headerBrand}>✦ ATELIER · WELCOME TOUR</Text>
+          <Text style={styles.headerBrand}>۞ HALAL MARKET · WELCOME TOUR</Text>
           <Pressable onPress={handleSkip} style={styles.skipBtn}>
             <Text style={styles.skipText}>Skip</Text>
           </Pressable>
@@ -195,7 +195,7 @@ export function OnboardingModal(): React.JSX.Element | null {
           {/* Actions */}
           <View style={styles.actionRow}>
             <Button
-              title={isLastStep ? "Enter Atelier Studio ✦" : "Next Step →"}
+              title={isLastStep ? "Enter Halal Market ۞" : "Next Step →"}
               variant="gold"
               onPress={handleNext}
             />

@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Atelier Habesha",
+    "name": "Halal Market",
     "slug": "seller-mobile-monorepo",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -11,7 +11,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#0A0D14",
+        "backgroundColor": "#02241C",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"

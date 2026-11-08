@@ -39,7 +39,7 @@ export function PackingSlipExportModal({
 
       const packingSlipContent = [
         "================================================",
-        "          ATELIER HABESHA · ADDIS ABABA",
+        "          HALAL MARKET · ADDIS ABABA",
         "        OFFICIAL DISPATCH PACKING SLIP",
         "================================================",
         `Order Number:   ${order.orderNumber}`,
@@ -57,8 +57,8 @@ export function PackingSlipExportModal({
         `Total Items:    ${order.items.reduce((acc, i) => acc + i.quantity, 0)} units`,
         `Declared Value: ${order.currency} ${order.total.toLocaleString()}`,
         "================================================",
-        "Dispatched via Atelier Secure Fulfillment Addis Ababa",
-        "Verification Hash: ETH-ATL-" + order.id.slice(-8).toUpperCase(),
+        "Dispatched via Halal Market Secure Fulfillment Addis Ababa",
+        "Verification Hash: ETH-HLM-" + order.id.slice(-8).toUpperCase(),
         "================================================",
       ].join("\n");
 
@@ -97,7 +97,7 @@ export function PackingSlipExportModal({
             <Card style={styles.slipCard}>
               {/* Slip Header */}
               <View style={styles.slipBranding}>
-                <Text style={styles.atelierWordmark}>✦ ATELIER HABESHA ✦</Text>
+                <Text style={styles.atelierWordmark}>۞ HALAL MARKET ۞</Text>
                 <Text style={styles.slipDocTitle}>DISPATCH & PACKING NOTE</Text>
                 <Text style={styles.slipDocSubtitle}>Addis Ababa Fulfillment Center</Text>
               </View>

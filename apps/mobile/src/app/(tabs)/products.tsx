@@ -475,16 +475,16 @@ export default function ProductsScreen(): React.JSX.Element {
           <View style={[styles.emptyIconCircle, { backgroundColor: isDark ? "rgba(245, 158, 11, 0.15)" : "#FEF3C7" }]}>
             <Ionicons name="sparkles" size={36} color={colors.gold} />
           </View>
-          <Text style={[styles.emptyTitle, { color: colors.textPrimary }]}>Atelier Catalogue Empty</Text>
+          <Text style={[styles.emptyTitle, { color: colors.textPrimary }]}>Halal Market Catalogue Empty</Text>
           <Text style={[styles.emptySubtitle, { color: colors.textSecondary }]}>
-            Add handcrafted items, leatherwork, or luxury apparel to your collection.
+            Add certified Halal meats, organic spices, attar fragrances, and modest fashion to your catalogue.
           </Text>
           <Pressable
             onPress={() => router.push("/products/create")}
             style={[styles.retryButton, { backgroundColor: colors.gold }]}
           >
             <Text style={[styles.retryButtonText, { color: isDark ? "#0A0D14" : "#FFFFFF" }]}>
-              + Add First Creation
+              + Add First Product
             </Text>
           </Pressable>
         </View>
@@ -615,7 +615,7 @@ export default function ProductsScreen(): React.JSX.Element {
               <Text style={[styles.modalTitle, { color: colors.textPrimary }]}>Batch Price Adjustment</Text>
             </View>
             <Text style={[styles.modalSubtitle, { color: colors.textSecondary }]}>
-              Applying update across {selectedIds.length} selected atelier items
+              Applying update across {selectedIds.length} selected Halal Market items
             </Text>
 
             <View style={[styles.modalInputWrap, { backgroundColor: colors.bgRaised, borderColor: colors.borderSubtle }]}>

@@ -91,7 +91,7 @@ export default function DashboardScreen(): React.JSX.Element {
       ]}
       showsVerticalScrollIndicator={false}
     >
-      {/* Atelier Habesha Luxury Brand Header */}
+      {/* Halal Market Luxury Brand Header */}
       <View style={styles.luxuryHeader}>
         <View style={styles.headerBrandRow}>
           <View style={styles.brandTitleBox}>
@@ -104,14 +104,14 @@ export default function DashboardScreen(): React.JSX.Element {
                 },
               ]}
             >
-              <Text style={styles.emblemText}>✦</Text>
+              <Text style={styles.emblemText}>۞</Text>
             </View>
             <View>
               <Text style={[styles.brandTitle, { color: colors.textPrimary }]}>
-                ATELIER HABESHA
+                HALAL MARKET
               </Text>
               <Text style={[styles.brandSubtitle, { color: colors.textSecondary }]}>
-                ADDIS ABABA · FLAGSHIP BOUTIQUE
+                ADDIS ABABA · CERTIFIED PURE
               </Text>
             </View>
           </View>

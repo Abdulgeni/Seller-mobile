@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 200" width="100%" height="100%">
+  <defs>
+    <linearGradient id="goldArch" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#D97706" />
+      <stop offset="50%" stop-color="#FCD34D" />
+      <stop offset="100%" stop-color="#D97706" />
+    </linearGradient>
+
+    <filter id="nodeGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="4" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+
+    <style>
+      @keyframes dashMove {
+        to { stroke-dashoffset: -40; }
+      }
+      @keyframes pulseNode {
+        0%, 100% { transform: scale(1); opacity: 0.95; }
+        50% { transform: scale(1.02); opacity: 1; }
+      }
+      .pipeline-line {
+        stroke-dasharray: 6 6;
+        animation: dashMove 2s linear infinite;
+      }
+      .node-1 { transform-origin: 100px 100px; animation: pulseNode 3s ease-in-out infinite; }
+      .node-2 { transform-origin: 300px 100px; animation: pulseNode 3s ease-in-out 0.7s infinite; }
+      .node-3 { transform-origin: 500px 100px; animation: pulseNode 3s ease-in-out 1.4s infinite; }
+      .node-4 { transform-origin: 720px 100px; animation: pulseNode 3s ease-in-out 2.1s infinite; }
+    </style>
+  </defs>
+
+  <!-- Background -->
+  <rect width="840" height="200" rx="16" fill="#021E17" stroke="#064E3B" stroke-width="1.5" />
+
+  <!-- Connecting Pipeline Wires with Animated Energy Particles -->
+  <line x1="180" y1="100" x2="240" y2="100" stroke="#F59E0B" stroke-width="2.5" class="pipeline-line" />
+  <line x1="380" y1="100" x2="440" y2="100" stroke="#F59E0B" stroke-width="2.5" class="pipeline-line" />
+  <line x1="580" y1="100" x2="640" y2="100" stroke="#F59E0B" stroke-width="2.5" class="pipeline-line" />
+
+  <!-- Node 1: @repo/schemas -->
+  <g class="node-1">
+    <rect x="30" y="55" width="150" height="90" rx="12" fill="#043C2E" stroke="#10B981" stroke-width="1.8" />
+    <circle cx="105" cy="78" r="12" fill="#064E3B" stroke="#10B981" stroke-width="1" />
+    <text x="105" y="82" text-anchor="middle" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="800" fill="#10B981">Z</text>
+    <text x="105" y="108" text-anchor="middle" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF">@repo/schemas</text>
+    <text x="105" y="124" text-anchor="middle" font-family="'Segoe UI', Roboto, sans-serif" font-size="9" font-weight="600" fill="#9BA5B7">Contract Zod Schemas</text>
+  </g>
+
+  <!-- Node 2: @repo/api -->
+  <g class="node-2">
+    <rect x="230" y="55" width="150" height="90" rx="12" fill="#043C2E" stroke="#F59E0B" stroke-width="1.8" />
+    <circle cx="305" cy="78" r="12" fill="#064E3B" stroke="#F59E0B" stroke-width="1" />
+    <text x="305" y="82" text-anchor="middle" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="800" fill="#FCD34D">⚡</text>
+    <text x="305" y="108" text-anchor="middle" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF">@repo/api</text>
+    <text x="305" y="124" text-anchor="middle" font-family="'Segoe UI', Roboto, sans-serif" font-size="9" font-weight="600" fill="#9BA5B7">MSW + FIFO Sync</text>
+  </g>
+
+  <!-- Node 3: @repo/ui -->
+  <g class="node-3">
+    <rect x="430" y="55" width="150" height="90" rx="12" fill="#043C2E" stroke="#8B5CF6" stroke-width="1.8" />
+    <circle cx="505" cy="78" r="12" fill="#064E3B" stroke="#8B5CF6" stroke-width="1" />
+    <text x="505" y="82" text-anchor="middle" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="800" fill="#A78BFA">✦</text>
+    <text x="505" y="108" text-anchor="middle" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF">@repo/ui</text>
+    <text x="505" y="124" text-anchor="middle" font-family="'Segoe UI', Roboto, sans-serif" font-size="9" font-weight="600" fill="#9BA5B7">Tokens &amp; Haptics</text>
+  </g>
+
+  <!-- Node 4: @repo/mobile (App) -->
+  <g class="node-4">
+    <rect x="630" y="45" width="180" height="110" rx="16" fill="#064E3B" stroke="url(#goldArch)" stroke-width="2.2" filter="url(#nodeGlow)" />
+    <circle cx="720" cy="74" r="14" fill="#02241C" stroke="#FCD34D" stroke-width="1.2" />
+    <text x="720" y="79" text-anchor="middle" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="800" fill="#FCD34D">۞</text>
+    <text x="720" y="106" text-anchor="middle" font-family="'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="800" fill="#FCD34D">HALAL MARKET</text>
+    <text x="720" y="122" text-anchor="middle" font-family="'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="700" fill="#FFFFFF">@repo/mobile</text>
+    <text x="720" y="136" text-anchor="middle" font-family="'Segoe UI', Roboto, sans-serif" font-size="8.5" font-weight="600" fill="#A7F3D0">Expo Router 58 · 60 FPS</text>
+  </g>
+</svg>

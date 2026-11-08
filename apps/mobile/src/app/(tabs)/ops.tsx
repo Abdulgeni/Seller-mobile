@@ -96,7 +96,7 @@ export default function OpsScreen(): React.JSX.Element {
             <Ionicons name="shield-checkmark" size={18} color={colors.gold} />
           </View>
           <View>
-            <Text style={[styles.headerTitle, { color: colors.textPrimary }]}>Vault & Atelier Operations</Text>
+            <Text style={[styles.headerTitle, { color: colors.textPrimary }]}>Halal Market Vault & Operations</Text>
             <Text style={[styles.headerSubtitle, { color: colors.textSecondary }]}>
               Cryptographic security & national payment rails
             </Text>

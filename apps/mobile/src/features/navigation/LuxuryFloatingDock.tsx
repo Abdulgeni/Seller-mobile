@@ -32,7 +32,7 @@ interface TabItemConfig {
 const TAB_CONFIGS: Record<string, TabItemConfig> = {
   index: {
     name: "index",
-    label: "Atelier",
+    label: "Market",
     activeIcon: "grid",
     inactiveIcon: "grid-outline",
   },
@@ -175,7 +175,7 @@ export function LuxuryFloatingDock(props: LuxuryFloatingDockProps): React.JSX.El
         ]}
       >
         <View style={styles.dockCapsule}>
-          {/* Left tabs (Atelier & Orders) */}
+          {/* Left tabs (Market & Orders) */}
           <View style={styles.tabsHalf}>
             {leftRoutes.map((route: TabRoute, idx: number) => renderTab(route, idx))}
           </View>
@@ -184,13 +184,13 @@ export function LuxuryFloatingDock(props: LuxuryFloatingDockProps): React.JSX.El
           <View style={styles.centerButtonAnchor}>
             <TouchableOpacity
               accessibilityRole="button"
-              accessibilityLabel="Atelier Quick Action Center"
+              accessibilityLabel="Halal Market Quick Action Center"
               testID="luxury-dock-center-action"
               onPress={handleCenterActionPress}
               activeOpacity={0.85}
               style={styles.centerButton}
             >
-              <Text style={styles.centerButtonGlyph}>✦</Text>
+              <Text style={styles.centerButtonGlyph}>۞</Text>
             </TouchableOpacity>
           </View>
 

@@ -1,0 +1,217 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 320" width="100%" height="100%">
+  <defs>
+    <!-- Rich 24K Sovereign Gold Gradient -->
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FEF3C7" />
+      <stop offset="35%" stop-color="#FCD34D" />
+      <stop offset="70%" stop-color="#D97706" />
+      <stop offset="100%" stop-color="#F59E0B" />
+    </linearGradient>
+
+    <!-- Deep Royal Emerald Radial Gradient -->
+    <radialGradient id="emeraldBg" cx="50%" cy="50%" r="60%">
+      <stop offset="0%" stop-color="#064E3B" stop-opacity="0.9" />
+      <stop offset="50%" stop-color="#043C2E" stop-opacity="0.95" />
+      <stop offset="100%" stop-color="#021E17" stop-opacity="1" />
+    </radialGradient>
+
+    <!-- Ambient Gold Glow -->
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="6" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+
+    <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+
+    <!-- CSS Keyframe Animations -->
+    <style>
+      @keyframes slowRotate {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+      }
+      @keyframes reverseRotate {
+        from { transform: rotate(360deg); }
+        to { transform: rotate(0deg); }
+      }
+      @keyframes pulseGlow {
+        0%, 100% { opacity: 0.65; transform: scale(0.98); }
+        50% { opacity: 1; transform: scale(1.02); }
+      }
+      @keyframes shimmer {
+        0% { opacity: 0.3; }
+        50% { opacity: 1; }
+        100% { opacity: 0.3; }
+      }
+      @keyframes livePulse {
+        0%, 100% { transform: scale(1); opacity: 0.9; }
+        50% { transform: scale(1.35); opacity: 0.4; }
+      }
+      .rotate-clockwise {
+        transform-origin: 140px 160px;
+        animation: slowRotate 36s linear infinite;
+      }
+      .rotate-counter {
+        transform-origin: 140px 160px;
+        animation: reverseRotate 24s linear infinite;
+      }
+      .pulsing-emblem {
+        transform-origin: 140px 160px;
+        animation: pulseGlow 4s ease-in-out infinite;
+      }
+      .twinkle-1 { animation: shimmer 3s ease-in-out infinite; }
+      .twinkle-2 { animation: shimmer 4s ease-in-out 1.5s infinite; }
+      .twinkle-3 { animation: shimmer 2.5s ease-in-out 0.8s infinite; }
+      .live-dot {
+        transform-origin: 326px 254px;
+        animation: livePulse 2s ease-in-out infinite;
+      }
+    </style>
+  </defs>
+
+  <!-- Background Canvas -->
+  <rect width="880" height="320" rx="20" fill="url(#emeraldBg)" stroke="#D97706" stroke-width="2" stroke-opacity="0.6" />
+
+  <!-- Background Decorative Arabesque Grid Pattern -->
+  <g opacity="0.08" stroke="#FCD34D" stroke-width="1">
+    <circle cx="140" cy="160" r="120" fill="none" />
+    <circle cx="140" cy="160" r="150" fill="none" />
+    <circle cx="140" cy="160" r="180" fill="none" />
+    <line x1="0" y1="160" x2="880" y2="160" stroke-dasharray="4 8" />
+    <line x1="140" y1="0" x2="140" y2="320" stroke-dasharray="4 8" />
+  </g>
+
+  <!-- Twinkling Ambient Stars -->
+  <g fill="#FCD34D">
+    <polygon points="340,50 342,56 348,58 342,60 340,66 338,60 332,58 338,56" class="twinkle-1" />
+    <polygon points="560,35 562,39 566,40 562,41 560,45 558,41 554,40 558,39" class="twinkle-2" />
+    <polygon points="810,70 812,75 817,77 812,79 810,84 808,79 803,77 808,75" class="twinkle-3" />
+    <polygon points="760,240 762,244 766,245 762,246 760,250 758,246 754,245 758,244" class="twinkle-1" />
+    <polygon points="460,280 461,284 465,285 461,286 460,290 459,286 455,285 459,284" class="twinkle-2" />
+  </g>
+
+  <!-- Ornate Golden Border Hairlines -->
+  <rect x="16" y="16" width="848" height="288" rx="14" fill="none" stroke="url(#gold)" stroke-width="1.2" stroke-opacity="0.4" />
+  <rect x="22" y="22" width="836" height="276" rx="10" fill="none" stroke="#D97706" stroke-width="0.8" stroke-opacity="0.25" />
+
+  <!-- Corner Cornerpiece Ornaments -->
+  <g fill="none" stroke="url(#gold)" stroke-width="1.5">
+    <path d="M 26 44 L 44 44 L 44 26" />
+    <circle cx="44" cy="44" r="2.5" fill="#FCD34D" />
+    <path d="M 854 44 L 836 44 L 836 26" />
+    <circle cx="836" cy="44" r="2.5" fill="#FCD34D" />
+    <path d="M 26 276 L 44 276 L 44 294" />
+    <circle cx="44" cy="276" r="2.5" fill="#FCD34D" />
+    <path d="M 854 276 L 836 276 L 836 294" />
+    <circle cx="836" cy="276" r="2.5" fill="#FCD34D" />
+  </g>
+
+  <!-- ==================== ANIMATED EMBLEM (LEFT) ==================== -->
+  <g class="pulsing-emblem">
+    <!-- Outer Counter-Rotating Geometric Star Ring -->
+    <g class="rotate-counter">
+      <!-- 8-Point Outer Geometric Star (Rub el Hizb) -->
+      <polygon points="140,55 165,70 185,55 190,80 215,80 205,105 225,120 210,140 225,160 205,175 215,200 190,200 185,225 165,210 140,225 115,210 95,225 90,200 65,200 75,175 55,160 70,140 55,120 75,105 65,80 90,80 95,55 115,70"
+               fill="none" stroke="#FCD34D" stroke-width="1" stroke-opacity="0.4" />
+    </g>
+
+    <!-- Main Rotating 8-Point Star with Translucent Emerald Glass Fill -->
+    <g class="rotate-clockwise">
+      <!-- Interlocking Square 1 (at 0 deg) -->
+      <rect x="80" y="100" width="120" height="120" rx="4"
+            fill="#043C2E" fill-opacity="0.8" stroke="url(#gold)" stroke-width="2.5" />
+      <!-- Interlocking Square 2 (at 45 deg) -->
+      <rect x="80" y="100" width="120" height="120" rx="4"
+            transform="rotate(45 140 160)"
+            fill="#064E3B" fill-opacity="0.8" stroke="url(#gold)" stroke-width="2.5" />
+      <!-- Inner Concentric Star Outline -->
+      <circle cx="140" cy="160" r="54" fill="none" stroke="#FCD34D" stroke-width="1.2" stroke-dasharray="3 3" />
+    </g>
+
+    <!-- Centerpiece: Gold Crescent & Radiant Morning Star (Static Anchor) -->
+    <g filter="url(#softGlow)">
+      <!-- Golden Crescent Moon -->
+      <path d="M 148 126 A 34 34 0 1 0 148 194 A 28 28 0 1 1 148 126 Z" fill="url(#gold)" />
+      <!-- 8-Point Center Morning Star -->
+      <polygon points="152,148 155,155 162,152 157,158 162,164 155,161 152,168 149,161 142,164 147,158 142,152 149,155" fill="#FEF3C7" />
+    </g>
+  </g>
+
+  <!-- ==================== TYPOGRAPHY & BRANDING (RIGHT) ==================== -->
+  <!-- Top Sovereign Badge -->
+  <g transform="translate(320, 52)">
+    <rect width="186" height="24" rx="12" fill="#043C2E" stroke="#D97706" stroke-width="1" />
+    <circle cx="12" cy="12" r="4" fill="#10B981" />
+    <text x="24" y="16" font-family="'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="800" fill="#FCD34D" letter-spacing="1.5">
+      100% CERTIFIED HALAL
+    </text>
+  </g>
+
+  <!-- Brand Title: HALAL MARKET -->
+  <text x="320" y="124" font-family="'Cinzel', 'Georgia', 'Times New Roman', serif" font-size="46" font-weight="bold" fill="url(#gold)" letter-spacing="3" filter="url(#softGlow)">
+    HALAL MARKET
+  </text>
+
+  <!-- Brand Subtitle -->
+  <text x="322" y="156" font-family="'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="700" fill="#FEF3C7" letter-spacing="2.2" opacity="0.95">
+    LUXURY SELLER SUITE &amp; SOVEREIGN COMMERCE PLATFORM
+  </text>
+
+  <!-- Feature Tags Row -->
+  <g transform="translate(320, 180)">
+    <!-- Pill 1: Expo SDK 58 -->
+    <g transform="translate(0, 0)">
+      <rect width="112" height="26" rx="6" fill="#021E17" stroke="#10B981" stroke-width="1" stroke-opacity="0.6" />
+      <text x="56" y="17" text-anchor="middle" font-family="'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="700" fill="#10B981">
+        EXPO SDK 58
+      </text>
+    </g>
+
+    <!-- Pill 2: React Native 0.88 -->
+    <g transform="translate(122, 0)">
+      <rect width="126" height="26" rx="6" fill="#021E17" stroke="#F59E0B" stroke-width="1" stroke-opacity="0.6" />
+      <text x="63" y="17" text-anchor="middle" font-family="'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="700" fill="#FCD34D">
+        REACT NATIVE 0.88
+      </text>
+    </g>
+
+    <!-- Pill 3: Turborepo Strict -->
+    <g transform="translate(258, 0)">
+      <rect width="118" height="26" rx="6" fill="#021E17" stroke="#3B82F6" stroke-width="1" stroke-opacity="0.6" />
+      <text x="59" y="17" text-anchor="middle" font-family="'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="700" fill="#60A5FA">
+        TURBOREPO STRICT
+      </text>
+    </g>
+
+    <!-- Pill 4: Offline-First FIFO -->
+    <g transform="translate(386, 0)">
+      <rect width="128" height="26" rx="6" fill="#021E17" stroke="#8B5CF6" stroke-width="1" stroke-opacity="0.6" />
+      <text x="64" y="17" text-anchor="middle" font-family="'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="700" fill="#A78BFA">
+        OFFLINE-FIRST FIFO
+      </text>
+    </g>
+  </g>
+
+  <!-- Live Payment Switch Footer Banner -->
+  <g transform="translate(320, 236)">
+    <!-- Base Capsule -->
+    <rect width="520" height="34" rx="17" fill="#021E17" stroke="#D97706" stroke-width="1" stroke-opacity="0.5" />
+
+    <!-- Pulsing Live Indicator -->
+    <circle cx="18" cy="17" r="4.5" fill="#10B981" />
+    <circle cx="18" cy="17" r="8" fill="#10B981" opacity="0.3" class="live-dot" />
+
+    <!-- Text -->
+    <text x="34" y="21" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="700" fill="#FCD34D" letter-spacing="0.5">
+      National Payment Switch · Telebirr · CBE Birr · M-Pesa Active
+    </text>
+
+    <!-- Right Shield -->
+    <g transform="translate(488, 7)" fill="#FCD34D">
+      <path d="M 8 2 L 2 5 L 2 10 C 2 14 5 18 8 20 C 11 18 14 14 14 10 L 14 5 Z" fill="none" stroke="#FCD34D" stroke-width="1.3" />
+      <path d="M 5 10 L 7 12 L 11 8" fill="none" stroke="#FCD34D" stroke-width="1.3" stroke-linecap="round" />
+    </g>
+  </g>
+</svg>

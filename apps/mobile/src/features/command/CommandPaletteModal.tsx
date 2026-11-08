@@ -90,8 +90,8 @@ export function CommandPaletteModal(): React.JSX.Element | null {
       {
         id: "act_onboarding",
         category: "ACTION",
-        title: "✦ Atelier Welcome & Tour",
-        subtitle: "Replay 3-step luxury guide to AI Studio & Ops",
+        title: "۞ Halal Market Welcome & Tour",
+        subtitle: "Replay 3-step guide to Halal Studio & Ops",
         onSelect: () => {
           close();
           useSettingsStore.getState().openOnboarding();

@@ -113,7 +113,7 @@ export function AIStudioLightboxModal({
             <View>
               <Text style={styles.title}>✦ AI Studio Retouch</Text>
               <Text style={styles.subtitle}>
-                Atelier automated lighting & backdrop staging
+                Halal Market automated lighting & backdrop staging
               </Text>
             </View>
             <Pressable

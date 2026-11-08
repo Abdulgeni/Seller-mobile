@@ -68,21 +68,21 @@ export function StorefrontPreviewModal({
         <View style={[styles.topNavigation, { backgroundColor: colors.bgSurface, borderBottomColor: colors.borderSubtle }]}>
           <TouchableOpacity
             accessibilityRole="button"
-            accessibilityLabel="Back to Seller Atelier"
+            accessibilityLabel="Back to Halal Market"
             onPress={() => {
               hapticFeedback.buttonPress();
               onClose();
             }}
-            style={[styles.backButton, { backgroundColor: isDark ? "rgba(245, 158, 11, 0.2)" : "#0A0D14", borderColor: colors.gold }]}
+            style={[styles.backButton, { backgroundColor: isDark ? "rgba(245, 158, 11, 0.2)" : "#02241C", borderColor: colors.gold }]}
             activeOpacity={0.8}
           >
             <Ionicons name="arrow-back" size={17} color={colors.gold} />
-            <Text style={[styles.backButtonText, { color: colors.gold }]}>Back to Atelier</Text>
+            <Text style={[styles.backButtonText, { color: colors.gold }]}>Back to Market</Text>
           </TouchableOpacity>
 
           <View style={styles.topHeaderCenter}>
-            <Text style={[styles.storeTitle, { color: colors.textPrimary }]}>ATELIER HABESHA</Text>
-            <Text style={[styles.storeSubtitle, { color: colors.gold }]}>ADDIS ABABA BUYER VIEW</Text>
+            <Text style={[styles.storeTitle, { color: colors.textPrimary }]}>HALAL MARKET</Text>
+            <Text style={[styles.storeSubtitle, { color: colors.gold }]}>CERTIFIED PURE · BUYER VIEW</Text>
           </View>
 
           <TouchableOpacity
@@ -110,23 +110,23 @@ export function StorefrontPreviewModal({
         >
           <View style={[styles.liveIndicatorDot, { backgroundColor: colors.accent }]} />
           <Text style={[styles.previewModeText, { color: colors.accent }]}>
-            BUYER PERSPECTIVE · Telebirr, CBE Birr & M-Pesa Active
+            BUYER PERSPECTIVE · 100% Halal Verified · Telebirr & CBE Birr Active
           </Text>
         </View>
 
         {/* Store Profile Header */}
         <View style={[styles.storeHeader, { backgroundColor: colors.bgSurface, borderBottomColor: colors.borderSubtle }]}>
           <View style={[styles.storeAvatar, { backgroundColor: isDark ? "rgba(245, 158, 11, 0.15)" : "#FEF3C7", borderColor: colors.gold }]}>
-            <Text style={[styles.avatarText, { color: colors.gold }]}>✦</Text>
+            <Text style={[styles.avatarText, { color: colors.gold }]}>۞</Text>
           </View>
           <View style={styles.storeMeta}>
-            <Text style={[styles.storeName, { color: colors.textPrimary }]}>Atelier Habesha Addis Ababa</Text>
+            <Text style={[styles.storeName, { color: colors.textPrimary }]}>Halal Market Addis Ababa</Text>
             <Text style={[styles.storeBio, { color: colors.textSecondary }]}>
-              Authentic handcrafted Ethiopian kemis, highland leather, 24K filigree & specialty coffee
+              100% Certified Halal meats, organic pantry essentials, modest fashion, attar perfumery & specialty dates
             </Text>
             <View style={styles.storeBadges}>
-              <Badge label="VERIFIED BOUTIQUE" variant="success" size="sm" />
-              <Badge label="ADDIS ABABA SAME-DAY" variant="warning" size="sm" />
+              <Badge label="100% HALAL CERTIFIED" variant="success" size="sm" />
+              <Badge label="SAME-DAY DISPATCH" variant="warning" size="sm" />
             </View>
           </View>
         </View>

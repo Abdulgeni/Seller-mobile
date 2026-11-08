@@ -36,7 +36,7 @@ export function LuxuryQuickActionModal({
   const actions = [
     {
       id: "add_product",
-      title: "Add Luxury Product (AI Studio)",
+      title: "Add Halal Product (AI Studio)",
       subtitle: "Capture with Carrara Marble & Velvet backdrops",
       icon: "camera" as const,
       color: colors.accent,
@@ -64,7 +64,7 @@ export function LuxuryQuickActionModal({
     {
       id: "buyer_storefront",
       title: "Live Customer Storefront View",
-      subtitle: "Preview Addis Ababa boutique perspective",
+      subtitle: "Preview Halal Market customer perspective",
       icon: "eye" as const,
       color: colors.gold,
       badge: "Live View",
@@ -104,10 +104,10 @@ export function LuxuryQuickActionModal({
               <View style={[styles.emblemBadge, { backgroundColor: isDark ? "rgba(245, 158, 11, 0.15)" : "#FEF3C7" }]}>
                 <Ionicons name="sparkles" size={14} color={colors.gold} />
               </View>
-              <Text style={[styles.title, { color: colors.textPrimary }]}>Atelier Quick Actions</Text>
+              <Text style={[styles.title, { color: colors.textPrimary }]}>Halal Market Quick Actions</Text>
             </View>
             <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
-              Instant operations for Addis Ababa Boutique Flagship
+              Instant operations for Halal Market Flagship
             </Text>
           </View>
 

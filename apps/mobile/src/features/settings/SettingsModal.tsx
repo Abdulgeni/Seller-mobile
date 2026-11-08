@@ -65,11 +65,11 @@ export function SettingsModal(): React.JSX.Element | null {
             </View>
             <View style={styles.profileMeta}>
               <View style={styles.tierRow}>
-                <Text style={styles.storeName}>Atelier Habesha Addis Ababa</Text>
-                <Badge label="SOVEREIGN TIER" variant="warning" size="sm" />
+                <Text style={styles.storeName}>Halal Market Addis Ababa</Text>
+                <Badge label="100% HALAL CERTIFIED" variant="success" size="sm" />
               </View>
               <Text style={styles.storeSub}>
-                Artisan Ethiopian Storefront · Multi-Vendor Seam Enabled
+                Certified Halal Storefront · Multi-Vendor Seam Enabled
               </Text>
               <Text style={styles.storeLocation}>📍 Bole Atlas, Addis Ababa, Ethiopia</Text>
             </View>
@@ -79,7 +79,7 @@ export function SettingsModal(): React.JSX.Element | null {
           <Card style={styles.sectionCard}>
             <Text style={styles.sectionHeader}>APPEARANCE & THEME</Text>
             <Text style={styles.sectionNotice}>
-              Handcrafted Atelier palette with obsidian slate and viridian emerald.
+              Halal Market palette with royal emerald obsidian and 24K sovereign gold.
             </Text>
             <View style={styles.themeSelector}>
               {modes.map((mode) => {
